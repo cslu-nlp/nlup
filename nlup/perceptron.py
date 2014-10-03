@@ -71,9 +71,9 @@ class Classifier(JSONable):
                 yhat = self.fit_one(x, y)
                 accuracy.update(y, yhat)
             logging.debug("Epoch {:>2} accuracy: {}".format(epoch,
-                                   self._accuracy_str(epoch, accuracy)))
+                                       self._accuracy_str(accuracy)))
             logging.debug("Epoch {:>2} time elapsed: {}.".format(epoch,
-                                                   self._time_str(tic)))
+                                       self._time_str(tic)))
 
     def _accuracy_str(self, accuracy):
         return "{1:.04f} [{0:.04f}, {2:.04f}].".format(*accuracy.confint)
