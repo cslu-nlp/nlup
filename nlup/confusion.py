@@ -139,6 +139,14 @@ class BinaryConfusion(ConfusionMixin):
  Hit  | {:>9,}    {:>9,}
  Miss | {:>9,}    {:>9,}""".format(self.tp, self.fn, self.fp, self.tn))
 
+    @property
+    def summary(self):
+        return """Accuracy:\t{:.04f}
+Precision:\t{:.04f}
+Recall:\t\t{:.04f}
+F1:\t\t{:.04f}""".format(self.accuracy, self.precision, 
+                         self.recall, self.F1)
+
     def __len__(self):
         return self.tp + self.fp + self.fn + self.tn
 
