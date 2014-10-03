@@ -62,7 +62,7 @@ class Classifier(JSONable):
     def fit(self, X, Y, epochs=EPOCHS):
         data = list(zip(X, Y))  # which is a copy
         logging.info("Starting {} epoch(s) of training.".format(epochs))
-        for i in range(1, 1 + epochs):
+        for epoch in range(1, 1 + epochs):
             logging.info("Starting epoch {:>2}.".format(i))
             tic = time()
             accuracy = Accuracy()
