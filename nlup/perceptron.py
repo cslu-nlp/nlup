@@ -408,15 +408,6 @@ class BinaryAveragedPerceptron(BinaryPerceptron):
 
 class AveragedPerceptron(Perceptron):
 
-    def __init__(self, *, default=None, seed=None):
-        self.classes = {default}
-        self.random = Random(seed)
-        self.classifiers = defaultdict(partial(defaultdict,
-                                               BinaryPerceptron))
-
-
-class AveragedPerceptron(Perceptron):
-
     """
     The multiclass perceptron with sparse binary feature vectors, with
     averaging for stability and regularization.
@@ -468,8 +459,3 @@ class SequenceAveragedPerceptron(AveragedPerceptron, SequencePerceptron):
         super(SequenceAveragedPerceptron, self).__init__(**kwargs)
         self.tfeats_fnc = tfeats_fnc
         self.order = order
-
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
