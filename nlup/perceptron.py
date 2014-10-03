@@ -63,7 +63,7 @@ class Classifier(JSONable):
         data = list(zip(X, Y))  # which is a copy
         logging.info("Starting {} epoch(s) of training.".format(epochs))
         for epoch in range(1, 1 + epochs):
-            logging.info("Starting epoch {:>2}.".format(i))
+            logging.info("Starting epoch {:>2}.".format(epoch))
             tic = time()
             accuracy = Accuracy()
             self.random.shuffle(data)
