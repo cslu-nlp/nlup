@@ -45,6 +45,7 @@ from collections import defaultdict, namedtuple
 
 from .confusion import Accuracy
 from .decorators import reversify
+from .jsonable import JSONable
 
 
 INF = float("inf")
