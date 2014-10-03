@@ -52,7 +52,7 @@ ORDER = 0
 EPOCHS = 1
 
 
-class Classifier(object):
+class Classifier(JSONable):
 
     """
     Mixin for shared classifier methods
