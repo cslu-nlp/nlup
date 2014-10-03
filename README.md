@@ -5,4 +5,4 @@
 * `decorators.py`: clever decorators for various purposes
 * `jsonable.py`: a mix-in which allows the state of most objects to be serialized to (and deserialized from) compressed JSON
 
-All have been tested on CPython 3.4.1 and PyPy 3.2.5 (PyPy version 2.3.1). They will not work on 
+All have been tested on CPython 3.4.1 and PyPy 3.2.5 (PyPy version 2.3.1). They will not work on Python 2 without modification.
