@@ -93,9 +93,15 @@ class BinaryPerceptron(Classifier):
         self.weights = defaultdict(int)
 
     def score(self, x):
+        """
+        Get score for a `hit` according to the feature vector `x`
+        """
         return sum(self.weights[feature] for feature in x)
 
     def predict(self, x):
+        """
+        Predict binary decision for the feature vector `x`
+        """
         return self.score(x) >= 0
 
     def fit_one(self, x, y):
@@ -105,12 +111,25 @@ class BinaryPerceptron(Classifier):
         return yhat
 
     def update(self, x, y, tau=1):
+        """
+        Given feature vector `x`, reward correct observation `y` with
+        the update `tau`
+        """
         if y is False:
             tau *= -1
-        elif y is not True:
-            raise ValueError("`y` is not boolean")
         for feature in x:
             self.weights[feature] += tau
+
+    def cull(self):
+        """
+        Remove zero-valued weights
+        """
+        ready_to_die = []
+        for (feature, weight) in self.weights.items():
+            if self.weight == 0:
+                ready_to_die.append(feature)
+        for feature in ready_to_die:
+            del self.weights[feature]
 
 
 class Perceptron(Classifier):
@@ -181,6 +200,18 @@ class Perceptron(Classifier):
             feature_ptr = self.weights[feature]
             feature_ptr[y] += tau
             feature_ptr[yhat] -= tau
+
+    def cull(self):
+        """
+        Remove zero-valued weights
+        """
+        ready_to_die = []
+        for (feature, cls_weight) in self.weights.items():
+            for (cls, weight) in cls_weight.items():
+                if self.weight == 0:
+                    ready_to_die.append((feature, cls))
+        for (feature, cls) in ready_to_die:
+            del self.weights[feature][cls]
 
 
 TrellisCell = namedtuple("TrellisCell", ["score", "pointer"])
@@ -389,6 +420,9 @@ class BinaryAveragedPerceptron(BinaryPerceptron):
         self.time = 0
 
     def predict(self, x):
+        """
+        Predict most likely class for the feature vector `x`
+        """
         score = sum(self.weights[feature].get(self.time) for feature in x)
         return score >= 0
 
@@ -398,12 +432,27 @@ class BinaryAveragedPerceptron(BinaryPerceptron):
         return retval
 
     def update(self, x, y, tau=1):
+        """
+        Given feature vector `x`, reward correct observation `y` and
+        punish incorrect hypothesis `yhat` with the update `tau`
+        """
         if y is False:
             tau *= -1
         elif y is not True:
             raise ValueError("y is not boolean")
         for feature in x:
             self.weights[feature].update(tau, self.time)
+
+    def cull(self):
+        """
+        Remove zero-valued weights
+        """
+        ready_to_die = []
+        for (feature, weight) in self.weights.items():
+            if weight.get(self.time) == 0:
+                ready_to_die.append(feature)
+        for feature in ready_to_die:
+            del self.weights[feature]
 
 
 class AveragedPerceptron(Perceptron):
@@ -447,10 +496,27 @@ class AveragedPerceptron(Perceptron):
         return retval
 
     def update(self, x, y, yhat, tau=1):
+        """
+        Given feature vector `x`, reward correct observation `y` and
+        punish incorrect hypothesis `yhat` with the update `tau`
+        """
         for feature in x:
             feature_ptr = self.weights[feature]
             feature_ptr[y].update(+tau, self.time)
             feature_ptr[yhat].update(-tau, self.time)
+
+    def cull(self):
+        """
+        Remove zero-valued weights
+        """
+        ready_to_die = []
+        for (feature, cls_weight) in self.weights.items():
+            for (cls, weight) in cls_weight.items():
+                if self.weight.get(self.time) == 0:
+                    ready_to_die.append((feature, cls))
+        for (feature, cls) in ready_to_die:
+            del self.weights[feature][cls]
+
 
 
 class SequenceAveragedPerceptron(AveragedPerceptron, SequencePerceptron):
