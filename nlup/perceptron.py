@@ -126,7 +126,7 @@ class BinaryPerceptron(Classifier):
         """
         ready_to_die = []
         for (feature, weight) in self.weights.items():
-            if self.weight == 0:
+            if weight == 0:
                 ready_to_die.append(feature)
         for feature in ready_to_die:
             del self.weights[feature]
@@ -208,7 +208,7 @@ class Perceptron(Classifier):
         ready_to_die = []
         for (feature, cls_weight) in self.weights.items():
             for (cls, weight) in cls_weight.items():
-                if self.weight == 0:
+                if weight == 0:
                     ready_to_die.append((feature, cls))
         for (feature, cls) in ready_to_die:
             del self.weights[feature][cls]
@@ -512,7 +512,7 @@ class AveragedPerceptron(Perceptron):
         ready_to_die = []
         for (feature, cls_weight) in self.weights.items():
             for (cls, weight) in cls_weight.items():
-                if self.weight.get(self.time) == 0:
+                if weight.get(self.time) == 0:
                     ready_to_die.append((feature, cls))
         for (feature, cls) in ready_to_die:
             del self.weights[feature][cls]
