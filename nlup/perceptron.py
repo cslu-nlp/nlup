@@ -23,14 +23,11 @@
 perceptron: perceptron-like classifers, including:
 
 * `BinaryPerceptron`: binary perceptron classifier
-* `Perceptron`: multiclass perceptron classifier using the "one vs. 
-   all" strategy
+* `Perceptron`: multiclass perceptron classifier
 * `SequencePerceptron`: multiclass perceptron for sequence tagging
 
 * `BinaryAveragedPerceptron`: binary averaged perceptron classifier
-   vs. all" strategy
-* `AveragedPerceptron`: multiclass averaged perceptron using the "one 
-   vs. all" strategy
+* `AveragedPerceptron`: multiclass averaged perceptron
 * `SequencePerceptron`: multiclass averaged perceptron for sequence tagging
 """
 

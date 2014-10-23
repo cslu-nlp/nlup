@@ -1,6 +1,6 @@
 `nlup` contains some base libraries I use in natural language understanding projects. Some highlights:
 
-* `perceptron.py`: perceptron-like classifiers (binary and multiclass using the one-versus-all strategy), including some forms of structured prediction
+* `perceptron.py`: perceptron-like classifiers (binary and multiclass), including some forms of structured prediction
 * `confusion.py`: classifier evaluation objects
 * `decorators.py`: clever decorators for various purposes
 * `jsonable.py`: a mix-in which allows the state of most objects to be serialized to (and deserialized from) compressed JSON
