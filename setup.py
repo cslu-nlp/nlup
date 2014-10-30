@@ -7,4 +7,5 @@ setup(name="nlup",
       author="Kyle Gorman",
       author_email="gormanky@ohsu.edu",
       url="http://github.com/cslu-nlp/nlup/",
+      install_requires=["jsonpickle >= 0.8.0"],
       packages=["nlup"])
