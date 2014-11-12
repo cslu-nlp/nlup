@@ -71,6 +71,7 @@ class Classifier(JSONable):
                                        self._accuracy_str(accuracy)))
             logging.debug("Epoch {:>2} time elapsed: {}.".format(epoch,
                                        self._time_elapsed_str(tic)))
+        self.finalize()
 
     def _accuracy_str(self, accuracy):
         return "{1:.04f} [{0:.04f}, {2:.04f}].".format(*accuracy.confint)
@@ -119,7 +120,7 @@ class BinaryPerceptron(Classifier):
 
     def cull(self):
         """
-        Remove zero-valued weights
+        Prepare for inference by removing zero-valued weights 
         """
         ready_to_die = []
         for (feature, weight) in self.weights.items():
@@ -200,7 +201,7 @@ class Perceptron(Classifier):
 
     def cull(self):
         """
-        Remove zero-valued weights
+        Prepare for inference by removing zero-valued weights 
         """
         ready_to_die = []
         for (feature, cls_weight) in self.weights.items():
@@ -362,12 +363,12 @@ class LazyWeight(object):
     >>> t += 1
     >>> lw.update(t, 1)
     >>> t += 1
-    >>> lw.get(t)
+    >>> lw.get()
     1
 
     # some time passes...
     >>> t += 1
-    >>> lw.get(t)
+    >>> lw.get()
     2
 
     # weight is now changed
@@ -375,7 +376,7 @@ class LazyWeight(object):
     >>> t += 3
     >>> lw.update(-1, t)
     >>> t += 3
-    >>> lw.get(t)
+    >>> lw.get()
     -1
     """
 
@@ -387,19 +388,18 @@ class LazyWeight(object):
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__, self.__dict__)
 
+    def get(self):
+        """
+        Return an up-to-date weight
+        """
+        return self.weight
+
     def _freshen(self, t):
         """
         Apply queued updates, and update the timestamp
         """
         self.summed_weight += (t - self.timestamp) * self.weight
         self.timestamp = t
-
-    def get(self, t):
-        """
-        Return an up-to-date sum of weights
-        """
-        self._freshen(t)
-        return self.summed_weight
 
     def update(self, value, t):
         """
@@ -408,6 +408,12 @@ class LazyWeight(object):
         self._freshen(t)
         self.weight += value
 
+    def average(self, t):
+        """
+        Set `self.weight` to the summed value, for post-hoc inference
+        """
+        self._freshen(t)
+        self.weight = self.summed_weight / t
 
 class BinaryAveragedPerceptron(BinaryPerceptron):
 
@@ -420,7 +426,7 @@ class BinaryAveragedPerceptron(BinaryPerceptron):
         """
         Predict most likely class for the feature vector `x`
         """
-        score = sum(self.weights[feature].get(self.time) for feature in x)
+        score = sum(self.weights[feature].get() for feature in x)
         return score >= 0
 
     def fit_one(self, x, y):
@@ -442,15 +448,18 @@ class BinaryAveragedPerceptron(BinaryPerceptron):
 
     def cull(self):
         """
-        Remove zero-valued weights
+        Prepare for inference by removing zero-valued weights and applying
+        averaging
         """
         ready_to_die = []
         for (feature, weight) in self.weights.items():
-            if weight.get(self.time) == 0:
+            w = weight.get()
+            if w == 0:
                 ready_to_die.append(feature)
+            else:
+                weight.average(self.time)
         for feature in ready_to_die:
             del self.weights[feature]
-
 
 class AveragedPerceptron(Perceptron):
 
@@ -474,8 +483,7 @@ class AveragedPerceptron(Perceptron):
         """
         Get score for one class (`y`) according to the feature vector `x`
         """
-        return sum(self.weights[feature][y].get(self.time) for
-                   feature in x)
+        return sum(self.weights[feature][y].get() for feature in x)
 
     def scores(self, x):
         """
@@ -484,7 +492,7 @@ class AveragedPerceptron(Perceptron):
         scores = dict.fromkeys(self.classes, 0)
         for feature in x:
             for (cls, weight) in self.weights[feature].items():
-                scores[cls] += weight.get(self.time)
+                scores[cls] += weight.get()
         return scores
 
     def fit_one(self, x, y):
@@ -504,16 +512,18 @@ class AveragedPerceptron(Perceptron):
 
     def cull(self):
         """
-        Remove zero-valued weights
+        Prepare for inference by removing zero-valued weights and applying
+        averaging
         """
         ready_to_die = []
         for (feature, cls_weight) in self.weights.items():
             for (cls, weight) in cls_weight.items():
                 if weight.get(self.time) == 0:
                     ready_to_die.append((feature, cls))
+                else:
+                    weight.average(self.time)
         for (feature, cls) in ready_to_die:
             del self.weights[feature][cls]
-
 
 
 class SequenceAveragedPerceptron(AveragedPerceptron, SequencePerceptron):
