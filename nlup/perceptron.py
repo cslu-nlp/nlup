@@ -454,8 +454,7 @@ class BinaryAveragedPerceptron(BinaryPerceptron):
         """
         ready_to_die = []
         for (feature, weight) in self.weights.items():
-            w = weight.get()
-            if w == 0:
+            if weight.get() == 0:
                 ready_to_die.append(feature)
             else:
                 weight.average(self.time)
@@ -519,7 +518,7 @@ class AveragedPerceptron(Perceptron):
         ready_to_die = []
         for (feature, cls_weight) in self.weights.items():
             for (cls, weight) in cls_weight.items():
-                if weight.get(self.time) == 0:
+                if weight.get() == 0:
                     ready_to_die.append((feature, cls))
                 else:
                     weight.average(self.time)
