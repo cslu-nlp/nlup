@@ -337,6 +337,7 @@ class SequencePerceptron(Perceptron):
                                        self._accuracy_str(accuracy)))
             logging.debug("Epoch {:>2} time elapsed: {}.".format(epoch,
                                        self._time_elapsed_str(tic)))
+        self.finalize()
 
 
 class LazyWeight(object):
