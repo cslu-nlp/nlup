@@ -118,7 +118,7 @@ class BinaryPerceptron(Classifier):
         for feature in x:
             self.weights[feature] += tau
 
-    def cull(self):
+    def finalize(self):
         """
         Prepare for inference by removing zero-valued weights 
         """
@@ -199,7 +199,7 @@ class Perceptron(Classifier):
             feature_ptr[y] += tau
             feature_ptr[yhat] -= tau
 
-    def cull(self):
+    def finalize(self):
         """
         Prepare for inference by removing zero-valued weights 
         """
@@ -446,7 +446,7 @@ class BinaryAveragedPerceptron(BinaryPerceptron):
         for feature in x:
             self.weights[feature].update(tau, self.time)
 
-    def cull(self):
+    def finalize(self):
         """
         Prepare for inference by removing zero-valued weights and applying
         averaging
@@ -510,7 +510,7 @@ class AveragedPerceptron(Perceptron):
             feature_ptr[y].update(+tau, self.time)
             feature_ptr[yhat].update(-tau, self.time)
 
-    def cull(self):
+    def finalize(self):
         """
         Prepare for inference by removing zero-valued weights and applying
         averaging
