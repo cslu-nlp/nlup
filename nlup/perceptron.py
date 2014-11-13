@@ -443,10 +443,15 @@ class BinaryAveragedPerceptron(BinaryPerceptron):
         Prepare for inference by removing zero-valued weights and applying
         averaging
         """
-        self.weights = {feature: {cls: weight for
-                                 (cls, weight) in clsweight.items() if
-                                       weight != 0} for
-                       (feature, clsweight) in self.weights.items()}
+        ready2die = []
+        for (feature, weight) in self.weights.items():
+            if weight == 0.:
+                ready2die.append(feature)
+            else:
+                weight.average(self.time)
+        for feature in ready2die:
+            del self.weights[feature]
+
 
 class AveragedPerceptron(Perceptron):
 
@@ -479,7 +484,6 @@ class AveragedPerceptron(Perceptron):
         scores = dict.fromkeys(self.classes, 0)
         for feature in x:
             for (cls, weight) in self.weights[feature].items():
-                print(feature, cls, weight)
                 scores[cls] += weight.get()
         return scores
 
@@ -503,10 +507,15 @@ class AveragedPerceptron(Perceptron):
         Prepare for inference by removing zero-valued weights and applying
         averaging
         """
-        self.weights = {feature: {cls: weight.average(self.time) for
-                                 (cls, weight) in clsweight.items() if
-                                       weight != 0} for
-                       (feature, clsweight) in self.weights.items()}
+        ready2die = []
+        for (feature, clsweights) in self.weights.items():
+            for (cls, weight) in clsweights.items():
+                if weight == 0.:
+                    ready2die.append((feature, cls))
+                else:
+                    weight.average(self.time)
+        for (feature, cls) in ready2die:    
+            del self.weights[feature][cls]
 
 
 class SequenceAveragedPerceptron(AveragedPerceptron, SequencePerceptron):
