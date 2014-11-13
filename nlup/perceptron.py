@@ -477,6 +477,8 @@ class AveragedPerceptron(Perceptron):
         Get scores for all classes according to the feature vector `x`
         """
         scores = dict.fromkeys(self.classes, 0)
+        print(self.weights)
+        exit("bye haters")
         for feature in x:
             for (cls, weight) in self.weights[feature].items():
                 scores[cls] += weight.get()
