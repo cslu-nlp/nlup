@@ -478,7 +478,6 @@ class AveragedPerceptron(Perceptron):
         """
         scores = dict.fromkeys(self.classes, 0)
         print(self.weights)
-        exit("bye haters")
         for feature in x:
             for (cls, weight) in self.weights[feature].items():
                 scores[cls] += weight.get()
