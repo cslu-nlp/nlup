@@ -39,10 +39,10 @@ def listify(gen):
 
 def reversify(fnc):
     """
-    Convert a function which returns an iterable to one which returns 
-    that as a reversed list. This is done by casting the iterable to a 
-    list (which evaluates it, if it was a generator) and then reversing 
-    it in place.
+    Convert a function which returns an iterable to one which returns
+    that as a reversed list. This is done by casting the iterable to a
+    list (which evaluates it, in the case it's a generator) and then
+    reversing it in place.
     """
     @wraps(fnc)
     def patched(*args, **kwargs):

@@ -122,13 +122,8 @@ class BinaryPerceptron(Classifier):
         """
         Prepare for inference by removing zero-valued weights 
         """
-        ready_to_die = []
-        for (feature, weight) in self.weights.items():
-            if weight == 0:
-                ready_to_die.append(feature)
-        for feature in ready_to_die:
-            del self.weights[feature]
-
+        self.weights = {feature: weight for feature in weight if 
+                        weight != 0}
 
 class Perceptron(Classifier):
 
@@ -203,14 +198,10 @@ class Perceptron(Classifier):
         """
         Prepare for inference by removing zero-valued weights 
         """
-        ready_to_die = []
-        for (feature, cls_weight) in self.weights.items():
-            for (cls, weight) in cls_weight.items():
-                if weight == 0:
-                    ready_to_die.append((feature, cls))
-        for (feature, cls) in ready_to_die:
-            del self.weights[feature][cls]
-
+        self.weights = {feature: {cls: weight for
+                                 (cls, weight) in clsweight.items() if
+                                       weight != 0} for
+                       (feature, clsweight) in self.weights.items()}
 
 TrellisCell = namedtuple("TrellisCell", ["score", "pointer"])
 
@@ -370,7 +361,7 @@ class LazyWeight(object):
     # some time passes...
     >>> t += 1
     >>> lw.get()
-    2
+    1
 
     # weight is now changed
     >>> lw.update(-1, t)
@@ -391,7 +382,7 @@ class LazyWeight(object):
 
     def get(self):
         """
-        Return an up-to-date weight
+        Return current weight
         """
         return self.weight
 
@@ -411,7 +402,7 @@ class LazyWeight(object):
 
     def average(self, t):
         """
-        Set `self.weight` to the summed value, for post-hoc inference
+        Set `self.weight` to the summed value, for final inference
         """
         self._freshen(t)
         self.weight = self.summed_weight / t
@@ -452,14 +443,10 @@ class BinaryAveragedPerceptron(BinaryPerceptron):
         Prepare for inference by removing zero-valued weights and applying
         averaging
         """
-        ready_to_die = []
-        for (feature, weight) in self.weights.items():
-            if weight.get() == 0:
-                ready_to_die.append(feature)
-            else:
-                weight.average(self.time)
-        for feature in ready_to_die:
-            del self.weights[feature]
+        self.weights = {feature: {cls: weight for
+                                 (cls, weight) in clsweight.items() if
+                                       weight != 0} for
+                       (feature, clsweight) in self.weights.items()}
 
 class AveragedPerceptron(Perceptron):
 
@@ -515,15 +502,10 @@ class AveragedPerceptron(Perceptron):
         Prepare for inference by removing zero-valued weights and applying
         averaging
         """
-        ready_to_die = []
-        for (feature, cls_weight) in self.weights.items():
-            for (cls, weight) in cls_weight.items():
-                if weight.get() == 0:
-                    ready_to_die.append((feature, cls))
-                else:
-                    weight.average(self.time)
-        for (feature, cls) in ready_to_die:
-            del self.weights[feature][cls]
+        self.weights = {feature: {cls: weight.average(self.time) for
+                                 (cls, weight) in clsweight.items() if
+                                       weight != 0} for
+                       (feature, clsweight) in self.weights.items()}
 
 
 class SequenceAveragedPerceptron(AveragedPerceptron, SequencePerceptron):
