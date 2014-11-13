@@ -2,7 +2,7 @@ from distutils.core import setup
 
 
 setup(name="nlup",
-      version="0.1",
+      version="0.2",
       description="Core libraries for natural language processing, with perceptron classifiers",
       author="Kyle Gorman",
       author_email="gormanky@ohsu.edu",
