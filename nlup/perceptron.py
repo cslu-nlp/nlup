@@ -74,7 +74,9 @@ class Classifier(JSONable):
         self.finalize()
 
     def _accuracy_str(self, accuracy):
-        return "{1:.04f} [{0:.04f}, {2:.04f}].".format(*accuracy.confint)
+        (lower, upper) = accuracy.confint
+        return "{:.04f} [{:.04f}, {:.04f}].".format(accuracy.accuracy,
+                                                    lower, upper)
 
     def _time_elapsed_str(self, tic):
         return "{}s".format(int(time() - tic))

@@ -49,7 +49,7 @@ class ConfusionMixin(object):
         a pain to compute the inverse error (i.e., R's qnorm). The lower
         bound is particularly useful in ranking.
 
-        The return value is a (lower_bound, accuracy, upper_bound) tuple.
+        The return value is a (lower_bound, upper_bound) tuple.
         """
         p = self.accuracy
         if not len(self):
@@ -60,7 +60,7 @@ class ConfusionMixin(object):
         a1 = 1. / (1. + zsq / n)
         a2 = phat + zsq / (2 * n)
         a3 = z * sqrt(phat * (1. - phat) / n + zsq / (4 * n * n))
-        return (a1 * (a2 - a3), phat, a1 * (a2 + a3))
+        return (a1 * (a2 - a3), a1 * (a2 + a3))
 
 
 class Accuracy(ConfusionMixin):
