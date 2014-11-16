@@ -56,7 +56,8 @@ class ConfusionMixin(object):
             return (0., 1.)
         n = len(self)
         phat = self.accuracy
-        zsq = -3.8414588206941244763470 # -qnorm(.05 / 2) ^ 2
+        z = 1.9599639845400538273879   # -qnorm(.05 / 2)
+        zsq = z * z
         a1 = 1. / (1. + zsq / n)
         a2 = phat + zsq / (2 * n)
         a3 = z * sqrt(phat * (1. - phat) / n + zsq / (4 * n * n))
