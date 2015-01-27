@@ -319,6 +319,8 @@ class Confusion(ConfusionMixin):
 
     def __init__(self):
         self.matrix = defaultdict(partial(defaultdict, int))
+        self.correct = 0
+        self.incorrect = 0
 
     def __len__(self):
         return sum(len(guesses) for guesses in self.matrix.values())
@@ -335,6 +337,10 @@ class Confusion(ConfusionMixin):
 
     def update(self, truth, guess, k=1):
         self.matrix[truth][guess] += k
+        if truth == guess:
+            self.correct += 1
+        else:
+            self.incorrect += 1
 
     def batch_update(self, truths, guesses):
         for (truth, guess) in zip(truths, guesses):
@@ -354,17 +360,28 @@ class Confusion(ConfusionMixin):
             truth_ptr = retval.matrix[truth]
             for (guess, count) in guess_count.items():
                 truth_ptr[guess] += count
+        retval.correct = self.correct + right.correct
+        retval.incorrect = self.incorrect + right.incorrect
         return retval
 
     @property
     def accuracy(self):
-        length = correct = 0
+        return self.correct / (self.correct + self.incorrect)
+
+    @property    
+    def Kappa(self):
+        """
+        Cohen's Kappa, a popular interannotator agreement statistic
+        
+        NB: This hasn't been closely tested, so use with caution.
+        """
+        # compute probability of accidental agreement
+        Pe = 0.
+        Z = sum(sum(gf.values()) for gf in self.matrix.values())
         for (truth, guess_count) in self.matrix.items():
-            for (guess, count) in guess_count.items():
-                if truth == guess:
-                    correct += count
-                length += count
-        return correct / length
+            Pe_i = sum(guess_count.values()) / Z
+            Pe += Pe_i * Pe_i
+        return (self.accuracy - Pe) / (1. - Pe)
 
 
 if __name__ == "__main__":

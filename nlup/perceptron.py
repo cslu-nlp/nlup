@@ -431,7 +431,8 @@ class BinaryAveragedPerceptron(BinaryPerceptron):
     def update(self, x, y, tau=1):
         """
         Given feature vector `x`, reward correct observation `y` and
-        punish incorrect hypothesis `yhat` with the update `tau`
+        punish incorrect hypothesis `yhat` with the update `tau`, 
+        assuming that `y != yhat`.
         """
         if y is False:
             tau *= -1
