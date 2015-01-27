@@ -383,6 +383,19 @@ class Confusion(ConfusionMixin):
             Pe += Pe_i * Pe_i
         return (self.accuracy - Pe) / (1. - Pe)
 
+    @property    
+    def Kappa(self):
+        """
+        Cohen's Kappa, a popular interannotator agreement statistic
+        """
+        # compute probability of accidental agreement
+        Pe = 0.
+        Z = sum(sum(gf.values()) for gf in self.matrix.values())
+        for (truth, guess_count) in self.matrix.items():
+            Pe_i = sum(guess_count.values()) / Z
+            Pe += Pe_i * Pe_i
+        return (self.accuracy - Pe) / (1. - Pe)
+
 
 if __name__ == "__main__":
     import doctest
