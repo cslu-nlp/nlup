@@ -319,7 +319,10 @@ class SequencePerceptron(Perceptron):
             if y != yhat:
                 # add hypothesized t-features to observed e-features
                 x += self.tfeats_fnc(yyhat[i - self.order:i])
+                print(yhat)
+                print(yyhat[i - self.order:i])
                 print(x)
+                print()
                 self.update(x, y, yhat)
         return yyhat
 
