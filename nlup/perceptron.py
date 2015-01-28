@@ -330,7 +330,6 @@ class SequencePerceptron(Perceptron):
         (xxt, yyhat) = self.predict_with_transitions(xx)
         for (i, (xt, y, yhat)) in enumerate(zip(xxt, yy, yyhat)):
             if y != yhat:
-                print(xt)
                 self.update(xt, y, yhat)
         return yyhat
 
