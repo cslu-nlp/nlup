@@ -41,8 +41,8 @@ from operator import itemgetter
 from collections import defaultdict, namedtuple
 
 from .confusion import Accuracy
-from .decorators import reversify
 from .jsonable import JSONable
+from .decorators import listify, reversify
 
 
 INF = float("inf")
