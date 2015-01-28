@@ -318,10 +318,10 @@ class SequencePerceptron(Perceptron):
         for (i, (x, y, yhat)) in enumerate(zip(xx, yy, yyhat)):
             if y != yhat:
                 # add hypothesized t-features to observed e-features
-                print(yhat)
-                print(x)
+                print("yhat:", yhat)
+                print("x (before):", x)
                 x += self.tfeats_fnc(yyhat[i - self.order:i])
-                print(x)
+                print("x (after):", x)
                 print()
                 self.update(x, y, yhat)
         return yyhat
