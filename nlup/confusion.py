@@ -366,8 +366,6 @@ class Confusion(ConfusionMixin):
 
     @property
     def accuracy(self):
-        print(self.correct)
-        print(self.incorrect)
         return self.correct / (self.correct + self.incorrect)
 
     @property    
