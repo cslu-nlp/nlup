@@ -323,7 +323,7 @@ class Confusion(ConfusionMixin):
         self.incorrect = 0
 
     def __len__(self):
-        return sum(len(guesses) for guesses in self.matrix.values())
+        return self.correct + self.incorrect
 
     def __repr__(self):
         return "{}()".format(self.__class__.__name__)
@@ -366,22 +366,9 @@ class Confusion(ConfusionMixin):
 
     @property
     def accuracy(self):
+        print(self.correct)
+        print(self.incorrect)
         return self.correct / (self.correct + self.incorrect)
-
-    @property    
-    def Kappa(self):
-        """
-        Cohen's Kappa, a popular interannotator agreement statistic
-        
-        NB: This hasn't been closely tested, so use with caution.
-        """
-        # compute probability of accidental agreement
-        Pe = 0.
-        Z = sum(sum(gf.values()) for gf in self.matrix.values())
-        for (truth, guess_count) in self.matrix.items():
-            Pe_i = sum(guess_count.values()) / Z
-            Pe += Pe_i * Pe_i
-        return (self.accuracy - Pe) / (1. - Pe)
 
     @property    
     def Kappa(self):
