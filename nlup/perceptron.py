@@ -237,7 +237,7 @@ class SequencePerceptron(Perceptron):
         """
         if self.order <= 0:
             return self._markov0_predict(xx)
-        else:        
+        else:
             (_, yyhat) = self._greedy_predict(xx)
         return yyhat
         # FIXME(kbg) disabled Viterbi decoding for the moment
@@ -276,7 +276,7 @@ class SequencePerceptron(Perceptron):
         xxt = []
         yyhat = []
         for x in xx:
-            xt = x + self.tfeats_fnc(sequence[-self.order:])
+            xt = x + self.tfeats_fnc(yyhat[-self.order:])
             xxt.append(xt)
             (yhat, _) = max(self.scores(xt).items(), key=itemgetter(1))
             yyhat.append(yhat)
