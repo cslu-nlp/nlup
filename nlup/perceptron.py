@@ -256,7 +256,7 @@ class SequencePerceptron(Perceptron):
         if self.order <=  0:
             return (xx, self._markov0_predict(xx))
         else:
-            return self._greedy_predict_with_transitions(xx)
+            return self._greedy_predict(xx)
 
     @listify
     def _markov0_predict(self, xx):
