@@ -29,7 +29,7 @@ from functools import wraps
 
 def listify(gen):
     """
-    Convert a generator into a function which returns a list
+    Converts a generator into a function which returns a list.
     """
     @wraps(gen)
     def patched(*args, **kwargs):
@@ -39,10 +39,10 @@ def listify(gen):
 
 def reversify(fnc):
     """
-    Convert a function which returns an iterable to one which returns
-    that as a reversed list. This is done by casting the iterable to a
-    list (which evaluates it, in the case it's a generator) and then
-    reversing it in place.
+    Converts a function (or generator) which returns an iterable to one 
+    which returns that as a reversed list. This is done by casting the 
+    iterable to a list (which evaluates it, in the case it's a generator) 
+    and then reversing it in place.
     """
     @wraps(fnc)
     def patched(*args, **kwargs):
@@ -54,7 +54,7 @@ def reversify(fnc):
 
 def setify(gen):
     """
-    Convert a generator into a function which returns a set
+    Converts a generator into a function which returns a set.
     """
     @wraps(gen)
     def patched(*args, **kwargs):
@@ -64,9 +64,9 @@ def setify(gen):
 
 def meanify(gen):
     """
-    Convert a generator of numbers to one which returns the mean value, 
+    Converts. a generator of numbers to one which returns the mean value, 
     iteratively computed to avoid overflow. This algorithm is recommended 
-    by Knuth (AoCP, 2.4.2.2).
+    in AoCP (2.4.2.2).
     """
     @wraps(gen)
     def patched(*args, **kwargs):
@@ -79,7 +79,7 @@ def meanify(gen):
 
 def IO(fnc):
     """
-    Convert a function which may throw an IOError to one which logs the
+    Converts a function which may throw an IOError to one which logs the
     error and quits, if it arises.
     """
     @wraps(fnc)
