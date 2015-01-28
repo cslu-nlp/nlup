@@ -264,8 +264,8 @@ class SequencePerceptron(Perceptron):
         """
         sequence = []
         for x in xx:
-            x += self.tfeats_fnc(sequence[-self.order:])
-            (yhat, _) = max(self.scores(x).items(), key=itemgetter(1))
+            xt = x + self.tfeats_fnc(sequence[-self.order:])
+            (yhat, _) = max(self.scores(xt).items(), key=itemgetter(1))
             sequence.append(yhat)
         return sequence
 
@@ -315,15 +315,14 @@ class SequencePerceptron(Perceptron):
         self.classes.update(yy)
         # decode to get predicted sequence
         yyhat = self.predict(xx)
-        print(xx)
         for (i, (x, y, yhat)) in enumerate(zip(xx, yy, yyhat)):
             if y != yhat:
                 # add hypothesized t-features to observed e-features
-                #print("yhat:", yhat)
-                #print("x (before):", x)
+                print("yhat:", yhat)
+                print("x (before):", x)
                 #x += self.tfeats_fnc(yyhat[i - self.order:i])
-                #print("x (after):", x)
-                #print()
+                print("x (after):", x)
+                print()
                 self.update(x, y, yhat)
         return yyhat
 
