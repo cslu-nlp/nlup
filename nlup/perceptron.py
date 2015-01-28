@@ -238,7 +238,8 @@ class SequencePerceptron(Perceptron):
         if self.order <= 0:
             return self._markov0_predict(xx)
         else:        
-            return self._greedy_predict(xx)
+            (_, yyhat) = self._greedy_predict(xx)
+        return yyhat
         # FIXME(kbg) disabled Viterbi decoding for the moment
         """
         if not xx:
@@ -247,6 +248,15 @@ class SequencePerceptron(Perceptron):
         (best_last_state, _) = max(trellis[-1].items(), key=itemgetter(1))
         return self._traceback(trellis, best_last_state)
         """
+
+    def predict_with_transitions(self, xx):
+        """
+        Same as above, but hacked to give you the xx's back
+        """
+        if self.order <=  0:
+            return (xx, self._markov0_predict(xx))
+        else:
+            return self._greedy_predict_with_transitions(xx)
 
     @listify
     def _markov0_predict(self, xx):
@@ -260,14 +270,17 @@ class SequencePerceptron(Perceptron):
     def _greedy_predict(self, xx):
         """
         Sequence classification with a greedy approximation of a Markov
-        model
+        model, also returning `xx` augmented with the appropriate
+        transition features
         """
-        sequence = []
+        xxt = []
+        yyhat = []
         for x in xx:
             xt = x + self.tfeats_fnc(sequence[-self.order:])
+            xxt.append(xt)
             (yhat, _) = max(self.scores(xt).items(), key=itemgetter(1))
-            sequence.append(yhat)
-        return sequence
+            yyhat.append(yhat)
+        return (xxt, yyhat)
 
     def _trellis(self, xx):
         """
@@ -314,16 +327,11 @@ class SequencePerceptron(Perceptron):
     def fit_one(self, xx, yy):
         self.classes.update(yy)
         # decode to get predicted sequence
-        yyhat = self.predict(xx)
-        for (i, (x, y, yhat)) in enumerate(zip(xx, yy, yyhat)):
+        (xxt, yyhat) = self.predict_with_transitions(xx)
+        for (i, (xt, y, yhat)) in enumerate(zip(xxt, yy, yyhat)):
             if y != yhat:
-                # add hypothesized t-features to observed e-features
-                print("yhat:", yhat)
-                print("x (before):", x)
-                #x += self.tfeats_fnc(yyhat[i - self.order:i])
-                print("x (after):", x)
-                print()
-                self.update(x, y, yhat)
+                print(xt)
+                self.update(xt, y, yhat)
         return yyhat
 
     def fit(self, XX, YY, epochs=EPOCHS):
