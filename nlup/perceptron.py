@@ -25,10 +25,10 @@ perceptron: perceptron-like classifers, including:
 * `BinaryPerceptron`: binary perceptron classifier
 * `Perceptron`: multiclass perceptron classifier
 * `SequencePerceptron`: multiclass perceptron for sequence tagging
-
 * `BinaryAveragedPerceptron`: binary averaged perceptron classifier
 * `AveragedPerceptron`: multiclass averaged perceptron
-* `SequencePerceptron`: multiclass averaged perceptron for sequence tagging
+* `SequenceAveragedPerceptron`: multiclass averaged perceptron for
+   sequence tagging
 """
 
 
@@ -212,14 +212,20 @@ class SequencePerceptron(Perceptron):
     Perceptron with Viterbi-decoding powers
     """
 
-    def __init__(self, *, tfeats_fnc=None, order=ORDER, **kwargs):
+    def __init__(self, *, tfeats_fnc, order=ORDER, **kwargs):
         super(SequencePerceptron, self).__init__(**kwargs)
         self.tfeats_fnc = tfeats_fnc
         self.order = order
 
     def predict(self, xx):
         """
-        Tag a sequence by applying the Viterbi algorithm:
+        Tag a sequence using a greedy approximation of the Viterbi 
+        algorithm, in which each sequence is tagged using transition
+        features based on earlier hypotheses. The time complexity of this 
+        operation is O(nt) where n is sequence length and t is the 
+        cardinality of the tagset. 
+
+        Alternatively a sequence can be tagged using the Viterbi algorithm:
 
         1. Compute tag-given-token forward probabilities and backtraces
         2. Compute the most probable final state
@@ -229,43 +235,47 @@ class SequencePerceptron(Perceptron):
         The time complexity of this operation is O(n t^2) where n is the
         sequence length and t is the cardinality of the tagset.
         """
+        if self.order <= 0:
+            return self._markov0_predict(xx)
+        else:        
+            return self._greedy_predict(xx)
+        # FIXME(kbg) disabled Viterbi decoding for the moment
+        """
         if not xx:
             return []
         trellis = self._trellis(xx)
         (best_last_state, _) = max(trellis[-1].items(), key=itemgetter(1))
         return self._traceback(trellis, best_last_state)
+        """
+
+    @listify
+    def _markov0_predict(self, xx):
+        """
+        Sequence classification with a Markov order-0 model
+        """
+        for x in xx:
+            (yhat, _) = max(self.scores(x).items(), key=itemgetter(1))
+            yield yhat
+
+    def _greedy_predict(self, xx):
+        """
+        Sequence classification with a greedy approximation of a Markov
+        model
+        """
+        sequence = []
+        for x in xx:
+            x += self.tfeats_fnc(sequence[-self.order:])
+            (yhat, _) = max(self.scores(x).items(), key=itemgetter(1))
+            sequence.append(yhat)
+        return sequence
 
     def _trellis(self, xx):
         """
-        Construct a trellis for decoding. The trellis is represented as a
-        list, in which each element represents a single point in time.
-        These elements are dictionaries mapping from state labels to
-        `TrellisCell` elements, which contain the state score and a
-        backpointer.
-        """
-        if self.order <= 0:
-            return self._markov0_trellis(xx)
-        else:
-            return self._viterbi_trellis(xx)
-
-    def _markov0_trellis(self, xx):
-        """
-        Construct a trellis for Markov order-0.
-        """
-        trellis = [{state: TrellisCell(score, None) for (state, score) in
-                    self.scores(xx[0]).items()}]
-        for x in xx[1:]:
-            (pstate, (pscore, _)) = max(trellis[-1].items(),
-                                        key=itemgetter(1))
-            column = {state: TrellisCell(pscore + escore, pstate) for
-                      (state, escore) in self.scores(x).items()}
-            trellis.append(column)
-        return trellis
-
-    def _viterbi_trellis(self, xx):
-        """
         Construct the trellis for Viterbi decoding assuming a non-zero
-        Markov order.
+        Markov order. The trellis is represented as a list, in which each 
+        element represents a single point in time. These elements are 
+        dictionaries mapping from state labels to `TrellisCell` elements, 
+        which contain the state score and a backpointer.
         """
         # first case is special
         trellis = [{state: TrellisCell(score, None) for (state, score) in
