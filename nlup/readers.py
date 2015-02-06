@@ -61,7 +61,8 @@ class DependencyParsedSentence(object):
         return "{}(tokens={!r}, tags={!r}, heads={!r}, labels={!r}".format(self.__class__.__name__, self.tokens, self.tags, self.heads, self.labels)
 
     def __str__(self):
-        lines = zip(self.tokens, self.tags, self.heads, self.labels)
+        heads = tuple(str(i) for i in self.heads)
+        lines = zip(self.tokens, self.tags, heads, self.labels)
         return "\n".join("\t".join(line) for line in lines)
 
 
