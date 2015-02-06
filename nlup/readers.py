@@ -51,6 +51,7 @@ class DependencyParsedSentence(object):
     def from_str(cls, string):
         bits = zip(*(line.split() for line in string.splitlines()))
         (tokens, tags, heads, labels) = bits
+        heads = tuple(int(i) for i in heads)
         return cls(tokens, tags, heads, labels)
 
     def __len__(self):
