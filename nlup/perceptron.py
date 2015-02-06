@@ -328,7 +328,7 @@ class SequencePerceptron(Perceptron):
         self.classes.update(yy)
         # decode to get predicted sequence
         (xxt, yyhat) = self.predict_with_transitions(xx)
-        for (i, (xt, y, yhat)) in enumerate(zip(xxt, yy, yyhat)):
+        for (xt, y, yhat) in zip(xxt, yy, yyhat):
             if y != yhat:
                 self.update(xt, y, yhat)
         return yyhat
