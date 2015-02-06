@@ -240,7 +240,7 @@ class SequencePerceptron(Perceptron):
         else:
             (_, yyhat) = self._greedy_predict(xx)
         return yyhat
-        # FIXME(kbg) disabled Viterbi decoding for the moment
+        # FIXME(kbg) disabled Viterbi decoding, at least for a bit
         """
         if not xx:
             return []
@@ -258,7 +258,7 @@ class SequencePerceptron(Perceptron):
         else:
             return self._greedy_predict(xx)
 
-    @listify
+    @tupleify
     def _markov0_predict(self, xx):
         """
         Sequence classification with a Markov order-0 model
@@ -280,7 +280,7 @@ class SequencePerceptron(Perceptron):
             xxt.append(xt)
             (yhat, _) = max(self.scores(xt).items(), key=itemgetter(1))
             yyhat.append(yhat)
-        return (xxt, yyhat)
+        return (tuple(xxt), tuple(yyhat))
 
     def _trellis(self, xx):
         """
@@ -318,6 +318,7 @@ class SequencePerceptron(Perceptron):
             trellis.append(column)
         return trellis
 
+    @tupleify
     @reversify
     def _traceback(self, trellis, state):
         for column in reversed(trellis):
