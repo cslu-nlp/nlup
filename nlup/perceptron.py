@@ -42,7 +42,7 @@ from collections import defaultdict, namedtuple
 
 from .confusion import Accuracy
 from .jsonable import JSONable
-from .decorators import listify, reversify
+from .decorators import reversify, setify
 
 
 INF = float("inf")
