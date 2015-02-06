@@ -52,6 +52,16 @@ def reversify(fnc):
     return patched
 
 
+def tupleify(gen):
+    """
+    Converts a generator into a function which returns a set.
+    """
+    @wraps(gen)
+    def patched(*args, **kwargs):
+        return tuple(gen(*args, **kwargs))
+    return patched
+
+
 def setify(gen):
     """
     Converts a generator into a function which returns a set.
