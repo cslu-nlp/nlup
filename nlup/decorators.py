@@ -72,6 +72,16 @@ def setify(gen):
     return patched
 
 
+def frozensetify(gen):
+    """
+    Converts a generator into a function which returns a frozenset.
+    """
+    @wraps(gen)
+    def patched(*args, **kwargs):
+        return frozenset(gen(*args, **kwargs))
+    return patched
+
+
 def meanify(gen):
     """
     Converts. a generator of numbers to one which returns the mean value, 
