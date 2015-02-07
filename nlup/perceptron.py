@@ -455,6 +455,7 @@ class AveragedPerceptron(Perceptron):
 class SequenceAveragedPerceptron(AveragedPerceptron, SequencePerceptron):
 
     def __init__(self, efeats_fnc, tfeats_fnc, order=ORDER, **kwargs):
-        super(SequenceAveragedPerceptron, self).__init__(
-              efeats_fnc=efeats_fnc, tfeats_fnc=tfeats_fnc, order=order,
-              **kwargs)
+        super(SequenceAveragedPerceptron, self).__init__(**kwargs)
+        self.efeats_fnc = efeats_fnc
+        self.tfeats_fnc = tfeats_fnc
+        self.order = order
