@@ -219,7 +219,7 @@ class SequencePerceptron(Perceptron):
         operation is O(nt) where n is sequence length and t is the 
         cardinality of the tagset. 
         """
-        (_, yyhat) = self._greedy_predict(xx)
+        (yyhat, _) = self._greedy_predict(xx)
         return yyhat
 
     def predict_with_transitions(self, xx):
