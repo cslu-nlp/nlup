@@ -56,21 +56,21 @@ class Classifier(JSONable):
     Mixin for shared classifier methods
     """
 
-    def fit(self, X, Y, epochs=EPOCHS):
-        data = list(zip(X, Y))  # which is a copy
+    def fit(self, Y, Phi, epochs=EPOCHS, alpha=1):
+        data = list(zip(Y, Phi))  # which is a copy
         logging.info("Starting {} epoch(s) of training.".format(epochs))
         for epoch in range(1, 1 + epochs):
             logging.info("Starting epoch {:>2}.".format(epoch))
             tic = time()
             accuracy = Accuracy()
             self.random.shuffle(data)
-            for (x, y) in data:
-                yhat = self.fit_one(x, y)
+            for (y, phi) in data:
+                yhat = self.fit_one(y, phi, alpha)
                 accuracy.update(y, yhat)
             logging.debug("Epoch {:>2} accuracy: {}".format(epoch,
-                                       self._accuracy_str(accuracy)))
+                                                            self._accuracy_str(accuracy)))
             logging.debug("Epoch {:>2} time elapsed: {}.".format(epoch,
-                                       self._time_elapsed_str(tic)))
+                                                                 self._time_elapsed_str(tic)))
         self.finalize()
 
     def _accuracy_str(self, accuracy):
@@ -79,6 +79,9 @@ class Classifier(JSONable):
     def _time_elapsed_str(self, tic):
         return "{}s".format(int(time() - tic))
 
+    def finalize(self):
+        pass
+
 
 class BinaryPerceptron(Classifier):
 
@@ -86,44 +89,40 @@ class BinaryPerceptron(Classifier):
     Binary perceptron classifier
     """
 
-    def __init__(self, *, seed=None):
+    def __init__(self, seed=None):
         self.random = Random(seed)
         self.weights = defaultdict(int)
 
-    def score(self, x):
+    def score(self, phi):
         """
-        Get score for a `hit` according to the feature vector `x`
+        Get score for a `hit` according to the feature vector `phi`
         """
-        return sum(self.weights[feature] for feature in x)
+        return sum(self.weights[feature] for feature in phi)
 
-    def predict(self, x):
+    def predict(self, phi):
         """
-        Predict binary decision for the feature vector `x`
+        Predict binary decision for the feature vector `phi`
         """
-        return self.score(x) >= 0
+        return self.score(phi) >= 0
 
-    def fit_one(self, x, y):
-        yhat = self.predict(x)
+    def fit_one(self, y, phi, alpha):
+        yhat = self.predict(phi)
         if y != yhat:
-            self.update(x, y)
+            self.update(y, phi)
         return yhat
 
-    def update(self, x, y, tau=1):
+    def update(self, y, phi, alpha=1):
         """
-        Given feature vector `x`, reward correct observation `y` with
-        the update `tau`
+        Given feature vector `y`, reward correct observation `y` with
+        the update `alpha`
         """
+        assert y in {True, False}
+        assert 0. < alpha <= 1.
         if y is False:
-            tau *= -1
-        for feature in x:
-            self.weights[feature] += tau
+            alpha *= -1
+        for phi_i in phi:
+            self.weights[phi] += alpha
 
-    def finalize(self):
-        """
-        Prepare for inference by removing zero-valued weights 
-        """
-        self.weights = {feature: weight for feature in weight if 
-                        weight != 0}
 
 class Perceptron(Classifier):
 
@@ -148,60 +147,54 @@ class Perceptron(Classifier):
 
     # constructor
 
-    def __init__(self, *, default=None, seed=None):
+    def __init__(self, default=None, seed=None):
         self.classes = {default}
         self.random = Random(seed)
         self.weights = defaultdict(partial(defaultdict, int))
 
-    def score(self, x, y):
+    def score(self, y, phi):
         """
-        Get score for one class (`y`) according to the feature vector `x`
+        Get score for one class (`y`) according to the feature vector
+        `phi`
         """
-        return sum(self.weights[feature][y] for feature in x)
+        return sum(self.weights[phi_i][y] for phi_i in phi)
 
-    def scores(self, x):
+    def scores(self, phi):
         """
-        Get scores for all classes according to the feature vector `x`
+        Get scores for all classes according to the feature vector `phi`
         """
         scores = dict.fromkeys(self.classes, 0)
-        for feature in x:
-            for (cls, weight) in self.weights[feature].items():
+        for phi_i in phi:
+            for (cls, weight) in self.weights[phi_i].items():
                 scores[cls] += weight
         return scores
 
-    def predict(self, x):
+    def predict(self, phi):
         """
-        Predict most likely class for the feature vector `x`
+        Predict most likely class for the feature vector `phi`
         """
-        scores = self.scores(x)
+        scores = self.scores(phi)
         (argmax_score, _) = max(scores.items(), key=itemgetter(1))
         return argmax_score
 
-    def fit_one(self, x, y):
+    def fit_one(self, y, phi, alpha=1):
         self.classes.add(y)
-        yhat = self.predict(x)
+        yhat = self.predict(phi)
         if y != yhat:
-            self.update(x, y, yhat)
+            self.update(y, yhat, phi, alpha)
         return yhat
 
-    def update(self, x, y, yhat, tau=1):
+    def update(self, y, yhat, phi, alpha=1):
         """
         Given feature vector `x`, reward correct observation `y` and
-        punish incorrect hypothesis `yhat` with the update `tau`
+        punish incorrect hypothesis `yhat` with the update `alpha`
         """
-        for feature in x:
-            feature_ptr = self.weights[feature]
-            feature_ptr[y] += tau
-            feature_ptr[yhat] -= tau
+        assert 0. < alpha <= 1.
+        for phi_i in phi:
+            ptr = self.weights[phi_i]
+            ptr[y] += alpha
+            ptr[yhat] -= alpha
 
-    def finalize(self):
-        """
-        Prepare for inference by removing zero-valued weights 
-        """
-        self.weights = {feature: {cls: weight for
-                                 (cls, weight) in clsweight.items() if
-                                       weight != 0} for
-                       (feature, clsweight) in self.weights.items()}
 
 TrellisCell = namedtuple("TrellisCell", ["score", "pointer"])
 
@@ -212,8 +205,9 @@ class SequencePerceptron(Perceptron):
     Perceptron with Viterbi-decoding powers
     """
 
-    def __init__(self, *, tfeats_fnc, order=ORDER, **kwargs):
+    def __init__(self, efeats_fnc, tfeats_fnc, order=ORDER, **kwargs):
         super(SequencePerceptron, self).__init__(**kwargs)
+        self.efeats_fnc = efeats_fnc
         self.tfeats_fnc = tfeats_fnc
         self.order = order
 
@@ -224,132 +218,54 @@ class SequencePerceptron(Perceptron):
         features based on earlier hypotheses. The time complexity of this 
         operation is O(nt) where n is sequence length and t is the 
         cardinality of the tagset. 
-
-        Alternatively a sequence can be tagged using the Viterbi algorithm:
-
-        1. Compute tag-given-token forward probabilities and backtraces
-        2. Compute the most probable final state
-        3. Follow backtraces from this most probable state to generate
-           the most probable tag sequence.
-
-        The time complexity of this operation is O(n t^2) where n is the
-        sequence length and t is the cardinality of the tagset.
         """
-        if self.order <= 0:
-            return self._markov0_predict(xx)
-        else:
-            (_, yyhat) = self._greedy_predict(xx)
+        (_, yyhat) = self._greedy_predict(xx)
         return yyhat
-        # FIXME(kbg) disabled Viterbi decoding, at least for a bit
-        """
-        if not xx:
-            return []
-        trellis = self._trellis(xx)
-        (best_last_state, _) = max(trellis[-1].items(), key=itemgetter(1))
-        return self._traceback(trellis, best_last_state)
-        """
 
     def predict_with_transitions(self, xx):
         """
-        Same as above, but hacked to give you the xx's back
+        Same as above, but hacked to give you the features back
         """
-        if self.order <=  0:
-            return (xx, self._markov0_predict(xx))
-        else:
-            return self._greedy_predict(xx)
-
-    @tupleify
-    def _markov0_predict(self, xx):
-        """
-        Sequence classification with a Markov order-0 model
-        """
-        for x in xx:
-            (yhat, _) = max(self.scores(x).items(), key=itemgetter(1))
-            yield yhat
+        return self._greedy_predict(xx)
 
     def _greedy_predict(self, xx):
         """
         Sequence classification with a greedy approximation of a Markov
-        model, also returning `xx` augmented with the appropriate
-        transition features
+        model, also returning feature vectors `phiphi`
         """
-        xxt = []
         yyhat = []
-        for x in xx:
-            xt = x + self.tfeats_fnc(yyhat[-self.order:])
-            xxt.append(xt)
-            (yhat, _) = max(self.scores(xt).items(), key=itemgetter(1))
+        phiphi = []
+        for phi in self.efeats_fnc(xx):
+            phi = phi + self.tfeats_fnc(yyhat[-self.order:])
+            (yhat, _) = max(self.scores(phi).items(), key=itemgetter(1))
             yyhat.append(yhat)
-        return (tuple(xxt), tuple(yyhat))
+            phiphi.append(phi)
+        return (tuple(yyhat), tuple(phiphi))
 
-    def _trellis(self, xx):
-        """
-        Construct the trellis for Viterbi decoding assuming a non-zero
-        Markov order. The trellis is represented as a list, in which each 
-        element represents a single point in time. These elements are 
-        dictionaries mapping from state labels to `TrellisCell` elements, 
-        which contain the state score and a backpointer.
-        """
-        # first case is special
-        trellis = [{state: TrellisCell(score, None) for (state, score) in
-                    self.scores(xx[0]).items()}]
-        for x in xx[1:]:
-            pcolumns = trellis[-self.order:]
-            # store previous state scores
-            pscores = {state: score for (state, (score, pointer)) in
-                       pcolumns[-1].items()}
-            # store best previous state + transmission scores
-            ptscores = {state: TrellisCell(-INF, None) for state in
-                        self.classes}
-            # find the previous state which maximizes the previous state +
-            # the transmission scores
-            for (pstate, pscore) in pscores.items():
-                tfeats = self.tfeats_fnc(self._traceback(pcolumns, pstate))
-                for (state, tscore) in self.scores(tfeats).items():
-                    ptscore = pscore + tscore
-                    (best_ptscore, _) = ptscores[state]
-                    if ptscore > best_ptscore:
-                        ptscores[state] = TrellisCell(ptscore, pstate)
-            # combine emission, previous state, and transmission scores
-            column = {}
-            for (state, escore) in self.scores(x).items():
-                (ptscore, pstate) = ptscores[state]
-                column[state] = TrellisCell(ptscore + escore, pstate)
-            trellis.append(column)
-        return trellis
-
-    @tupleify
-    @reversify
-    def _traceback(self, trellis, state):
-        for column in reversed(trellis):
-            yield state
-            state = column[state].pointer
-
-    def fit_one(self, xx, yy):
+    def fit_one(self, yy, xx):
         self.classes.update(yy)
         # decode to get predicted sequence
-        (xxt, yyhat) = self.predict_with_transitions(xx)
-        for (xt, y, yhat) in zip(xxt, yy, yyhat):
+        (yyhat, phiphi) = self.predict_with_transitions(xx)
+        for (y, yhat, phi) in zip(yy, yyhat, phiphi):
             if y != yhat:
-                self.update(xt, y, yhat)
+                self.update(y, yhat, phi)
         return yyhat
 
-    def fit(self, XX, YY, epochs=EPOCHS):
-        data = list(zip(XX, YY))
+    def fit(self, YY, XX, epochs=EPOCHS, alpha=1):
+        data = list(zip(YY, XX))
         logging.info("Starting {} epoch(s) of training.".format(epochs))
         for epoch in range(1, 1 + epochs):
             logging.info("Starting epoch {:>2}.".format(epoch))
             tic = time()
             accuracy = Accuracy()
             self.random.shuffle(data)
-            for (xx, yy) in data:
-                yyhat = self.fit_one(xx, yy)
-                for (y, yhat) in zip(yy, yyhat):
-                    accuracy.update(y, yhat)
+            for (yy, xx) in data:
+                yyhat = self.fit_one(yy, xx, alpha)
+                accuracy.batch_update(yy, yyhat)
             logging.debug("Epoch {:>2} accuracy: {}".format(epoch,
-                                       self._accuracy_str(accuracy)))
+                                                            self._accuracy_str(accuracy)))
             logging.debug("Epoch {:>2} time elapsed: {}.".format(epoch,
-                                       self._time_elapsed_str(tic)))
+                                                                 self._time_elapsed_str(tic)))
         self.finalize()
 
 
@@ -429,51 +345,49 @@ class LazyWeight(object):
         self._freshen(t)
         self.weight = self.summed_weight / t
 
+
 class BinaryAveragedPerceptron(BinaryPerceptron):
 
-    def __init__(self, *, seed=None):
+    def __init__(self, seed=None):
         self.random = Random(seed)
         self.weights = defaultdict(LazyWeight)
         self.time = 0
 
-    def predict(self, x):
+    def predict(self, phi):
         """
-        Predict most likely class for the feature vector `x`
+        Predict most likely class for the feature vector `phi`
         """
-        score = sum(self.weights[feature].get() for feature in x)
+        score = sum(self.weights[feature].get() for feature in phi)
         return score >= 0
 
-    def fit_one(self, x, y):
-        retval = super(BinaryAveragedPerceptron, self).fit_one(x, y)
+    def fit_one(self, y, phi, alpha=1):
+        retval = super(BinaryAveragedPerceptron, self).fit_one(y, phi,
+                                                               alpha)
         self.time += 1
         return retval
 
-    def update(self, x, y, tau=1):
+    def update(self, y, phi, alpha=1):
         """
-        Given feature vector `x`, reward correct observation `y` and
-        punish incorrect hypothesis `yhat` with the update `tau`, 
+        Given feature vector `phi`, reward correct observation `y` and
+        punish incorrect hypothesis `yhat` with the update `alpha`, 
         assuming that `y != yhat`.
         """
+        assert y in {True, False}
+        assert 0. < alpha <= 1.
         if y is False:
-            tau *= -1
-        elif y is not True:
-            raise ValueError("y is not boolean")
-        for feature in x:
-            self.weights[feature].update(tau, self.time)
+            alpha *= -1
+        for phi_i in phi:
+            self.weights[phi_i].update(alpha, self.time)
 
     def finalize(self):
         """
         Prepare for inference by removing zero-valued weights and applying
         averaging
+
+        TODO(kbg): also remove zero-valued weights?
         """
-        ready2die = []
         for (feature, weight) in self.weights.items():
-            if weight == 0.:
-                ready2die.append(feature)
-            else:
-                weight.average(self.time)
-        for feature in ready2die:
-            del self.weights[feature]
+            weight.average(self.time)
 
 
 class AveragedPerceptron(Perceptron):
@@ -488,62 +402,59 @@ class AveragedPerceptron(Perceptron):
     the perceptron algorithm. Machine Learning 37(3): 227-296.
     """
 
-    def __init__(self, *, default=None, seed=None):
+    def __init__(self, default=None, seed=None):
         self.classes = {default}
         self.random = Random(seed)
         self.weights = defaultdict(partial(defaultdict, LazyWeight))
         self.time = 0
 
-    def score(self, x, y):
+    def score(self, y, phi):
         """
-        Get score for one class (`y`) according to the feature vector `x`
+        Get score for one class (`y`) according to the feature vector 
+        `phi`
         """
-        return sum(self.weights[feature][y].get() for feature in x)
+        return sum(self.weights[phi_i][y].get() for phi_i in phi)
 
-    def scores(self, x):
+    def scores(self, phi):
         """
-        Get scores for all classes according to the feature vector `x`
+        Get scores for all classes according to the feature vector `phi`
         """
         scores = dict.fromkeys(self.classes, 0)
-        for feature in x:
-            for (cls, weight) in self.weights[feature].items():
+        for phi_i in phi:
+            for (cls, weight) in self.weights[phi_i].items():
                 scores[cls] += weight.get()
         return scores
 
-    def fit_one(self, x, y):
-        retval = super(AveragedPerceptron, self).fit_one(x, y)
+    def fit_one(self, y, phi, alpha=1):
+        retval = super(AveragedPerceptron, self).fit_one(y, phi, alpha)
         self.time += 1
         return retval
 
-    def update(self, x, y, yhat, tau=1):
+    def update(self, y, yhat, phi, alpha=1):
         """
-        Given feature vector `x`, reward correct observation `y` and
-        punish incorrect hypothesis `yhat` with the update `tau`
+        Given feature vector `phi`, reward correct observation `y` and
+        punish incorrect hypothesis `yhat` with the update `alpha`
         """
-        for feature in x:
-            feature_ptr = self.weights[feature]
-            feature_ptr[y].update(+tau, self.time)
-            feature_ptr[yhat].update(-tau, self.time)
+        for phi_i in phi:
+            ptr = self.weights[phi_i]
+            ptr[y].update(+alpha, self.time)
+            ptr[yhat].update(-alpha, self.time)
 
     def finalize(self):
         """
         Prepare for inference by removing zero-valued weights and applying
         averaging
+
+        TODO(kbg): also remove zero-valued weights?
         """
-        ready2die = []
-        for (feature, clsweights) in self.weights.items():
+        for (phi_i, clsweights) in self.weights.items():
             for (cls, weight) in clsweights.items():
-                if weight == 0.:
-                    ready2die.append((feature, cls))
-                else:
-                    weight.average(self.time)
-        for (feature, cls) in ready2die:    
-            del self.weights[feature][cls]
+                weight.average(self.time)
 
 
 class SequenceAveragedPerceptron(AveragedPerceptron, SequencePerceptron):
 
-    def __init__(self, *, tfeats_fnc=None, order=ORDER, **kwargs):
+    def __init__(self, efeats_fnc, tfeats_fnc, order=ORDER, **kwargs):
         super(SequenceAveragedPerceptron, self).__init__(**kwargs)
         self.tfeats_fnc = tfeats_fnc
         self.order = order

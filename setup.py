@@ -2,7 +2,7 @@ from setuptools import setup
 
 
 setup(name="nlup",
-      version="0.2",
+      version="0.3",
       description="Core libraries for natural language processing, with perceptron classifiers",
       author="Kyle Gorman",
       author_email="gormanky@ohsu.edu",
