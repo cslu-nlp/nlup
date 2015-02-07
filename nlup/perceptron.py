@@ -105,10 +105,10 @@ class BinaryPerceptron(Classifier):
         """
         return self.score(phi) >= 0
 
-    def fit_one(self, y, phi, alpha):
+    def fit_one(self, y, phi, alpha=1):
         yhat = self.predict(phi)
         if y != yhat:
-            self.update(y, phi)
+            self.update(y, phi, alpha)
         return yhat
 
     def update(self, y, phi, alpha=1):
@@ -242,13 +242,13 @@ class SequencePerceptron(Perceptron):
             phiphi.append(phi)
         return (tuple(yyhat), tuple(phiphi))
 
-    def fit_one(self, yy, xx):
+    def fit_one(self, yy, xx, alpha=1):
         self.classes.update(yy)
         # decode to get predicted sequence
         (yyhat, phiphi) = self.predict_with_transitions(xx)
         for (y, yhat, phi) in zip(yy, yyhat, phiphi):
             if y != yhat:
-                self.update(y, yhat, phi)
+                self.update(y, yhat, phi, alpha)
         return yyhat
 
     def fit(self, YY, XX, epochs=EPOCHS, alpha=1):
@@ -263,9 +263,9 @@ class SequencePerceptron(Perceptron):
                 yyhat = self.fit_one(yy, xx, alpha)
                 accuracy.batch_update(yy, yyhat)
             logging.debug("Epoch {:>2} accuracy: {}".format(epoch,
-                                                            self._accuracy_str(accuracy)))
+                                         self._accuracy_str(accuracy)))
             logging.debug("Epoch {:>2} time elapsed: {}.".format(epoch,
-                                                                 self._time_elapsed_str(tic)))
+                                         self._time_elapsed_str(tic)))
         self.finalize()
 
 
