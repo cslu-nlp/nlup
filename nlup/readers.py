@@ -65,6 +65,22 @@ class DependencyParsedSentence(object):
         lines = zip(self.tokens, self.tags, heads, self.labels)
         return "\n".join("\t".join(line) for line in lines)
 
+    def latex_str(self, labels=False):
+        """
+        Print as a string for a LaTeX table
+        """
+        edges = ""
+        for (i, (head, label)) in enumerate(zip(self.heads, self.labels)):
+            edges += "    \\\depedge{{{}}}{{{}}}{{{}}}".format(head + 1,
+                                                               i + 1,
+                                                               label)
+        return """\\begin{{dependency}}[theme=default]
+    \\begin{{deptext}}[column sep=1em, row sep=1em]
+    {} \\& ROOT \\\\
+    \\end{{deptext}}
+{}
+\\end{{dependency}}""".format(" \\& ".join(self.tokens), edges)
+
 
 class ConstituencyParsedSentence(object):
 
