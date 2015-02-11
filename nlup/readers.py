@@ -71,9 +71,9 @@ class DependencyParsedSentence(object):
         """
         edges = ""
         for (i, (head, label)) in enumerate(zip(self.heads, self.labels)):
-            edges += "    \\depedge{{{}}}{{{}}}{{{}}}".format(head + 1,
-                                                               i + 1,
-                                                               label)
+            edges += "    \\depedge{{{}}}{{{}}}{{{}}}\n".format(head + 1,
+                                                                i + 1,
+                                                                label)
         return """\\begin{{dependency}}[theme=default]
     \\begin{{deptext}}[column sep=1em, row sep=1em]
     {} \\& ROOT \\\\
