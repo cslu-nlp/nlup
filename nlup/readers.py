@@ -4,6 +4,7 @@ Objects representing tagged or dependency-parsed sentences
 
 from nltk import str2tuple, tuple2str
 
+
 def untagged_corpus(filename):
     """
     Generate token lists from a file handle
