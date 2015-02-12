@@ -32,6 +32,15 @@ class TaggedSentence(object):
                         zip(self.tokens, self.tags))
 
 
+def tagged_reader(filename):
+    """
+    Generate `TaggedSentence` objects from a file handle
+    """
+    with open(filename, "r") as source:
+        for line in source:
+            yield TaggedSentence.from_str(line)
+
+
 class DependencyParsedSentence(object):
     """
     Dependency parsed data in `token\ttag\thead\tlabel` format
@@ -42,10 +51,8 @@ class DependencyParsedSentence(object):
         self.tags = tags
         self.heads = heads
         self.labels = labels
-        assert len(self.tokens) == \
-            len(self.tags)   == \
-            len(self.heads)  == \
-            len(self.labels)
+        assert len(self.tokens) == len(self.tags) == len(self.heads) == \
+               len(self.labels)
 
     @classmethod
     def from_str(cls, string):
@@ -82,7 +89,27 @@ class DependencyParsedSentence(object):
 \\end{{dependency}}""".format(" \\& ".join(self.tokens), edges)
 
 
+def depparsed_reader(filename):
+    """
+    Generate `DependencyParseSentence` objects from a file handle
+    """
+    with open(filename, "r") as source:
+        sentence = ""
+        for line in source:
+            if line.isspace():
+                yield DependencyParseSentence.from_str(sentence)
+                sentence = ""
+                continue
+            sentence += line
+        if sentence:
+            yield DependencyParseSentence.from_str(sentence)
+
+
 class ConstituencyParsedSentence(object):
 
     def __init__(self):
         raise NotImplementedError
+
+
+def conparsed_reader(filename):
+    raise NotImplementedError
