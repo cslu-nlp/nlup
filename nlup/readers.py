@@ -32,7 +32,7 @@ class TaggedSentence(object):
                         zip(self.tokens, self.tags))
 
 
-def tagged_reader(filename):
+def tagged_corpus(filename):
     """
     Generate `TaggedSentence` objects from a file handle
     """
@@ -89,7 +89,7 @@ class DependencyParsedSentence(object):
 \\end{{dependency}}""".format(" \\& ".join(self.tokens), edges)
 
 
-def depparsed_reader(filename):
+def depparsed_corpus(filename):
     """
     Generate `DependencyParseSentence` objects from a file handle
     """
