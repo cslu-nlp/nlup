@@ -4,6 +4,14 @@ Objects representing tagged or dependency-parsed sentences
 
 from nltk import str2tuple, tuple2str
 
+def untagged_corpus(filename):
+    """
+    Generate token lists from a file handle
+    """
+    with open(filename, "r") as source:
+        for line in source:
+            yield line.split()
+
 
 class TaggedSentence(object):
     """
