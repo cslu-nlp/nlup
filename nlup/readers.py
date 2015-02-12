@@ -97,12 +97,12 @@ def depparsed_reader(filename):
         sentence = ""
         for line in source:
             if line.isspace():
-                yield DependencyParseSentence.from_str(sentence)
+                yield DependencyParsedSentence.from_str(sentence)
                 sentence = ""
                 continue
             sentence += line
         if sentence:
-            yield DependencyParseSentence.from_str(sentence)
+            yield DependencyParsedSentence.from_str(sentence)
 
 
 class ConstituencyParsedSentence(object):
