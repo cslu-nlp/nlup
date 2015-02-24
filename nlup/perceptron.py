@@ -60,15 +60,14 @@ class Classifier(JSONable):
         data = list(zip(Y, Phi))  # which is a copy
         logging.info("Starting {} epoch(s) of training.".format(epochs))
         for epoch in range(1, 1 + epochs):
-            logging.info("Starting epoch {:>2}.".format(epoch))
+            logging.info("Epoch {:>2}.".format(epoch))
             accuracy = Accuracy()
             self.random.shuffle(data)
             with Timer():
                 for (y, phi) in data:
                     yhat = self.fit_one(y, phi, alpha)
                     accuracy.update(y, yhat)
-                logging.debug("Epoch {:>2} accuracy: {!s}".format(epoch,
-                                                           accuracy))
+                logging.debug("Accuracy: {!s}".format(epoch, accuracy))
         self.finalize()
 
     def finalize(self):
@@ -247,15 +246,14 @@ class SequencePerceptron(Perceptron):
         data = list(zip(YY, XX))
         logging.info("Starting {} epoch(s) of training.".format(epochs))
         for epoch in range(1, 1 + epochs):
-            logging.info("Starting epoch {:>2}.".format(epoch))
+            logging.info("Epoch {:>2}.".format(epoch))
             accuracy = Accuracy()
             self.random.shuffle(data)
             with Timer():
                 for (yy, xx) in data:
                     yyhat = self.fit_one(yy, xx, alpha)
                     accuracy.batch_update(yy, yyhat)
-                logging.debug("Epoch {:>2} accuracy: {!s}".format(epoch,
-                                                           accuracy))
+                logging.debug("Accuracy: {!s}".format(epoch, accuracy))
         self.finalize()
 
 
