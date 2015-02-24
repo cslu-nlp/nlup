@@ -47,6 +47,9 @@ def tagged_corpus(filename):
     """
     with open(filename, "r") as source:
         for line in source:
+            line = line.strip()
+            if not line:
+                continue
             yield TaggedSentence.from_str(line)
 
 
