@@ -67,8 +67,8 @@ class Classifier(JSONable):
                 for (y, phi) in data:
                     yhat = self.fit_one(y, phi, alpha)
                     accuracy.update(y, yhat)
-                logging.debug("Epoch {:>2} accuracy: {:.4f}".format(epoch,
-                                                             accuracy))
+                logging.debug("Epoch {:>2} accuracy: {!s}".format(epoch,
+                                                           accuracy))
         self.finalize()
 
     def finalize(self):
@@ -254,8 +254,8 @@ class SequencePerceptron(Perceptron):
                 for (yy, xx) in data:
                     yyhat = self.fit_one(yy, xx, alpha)
                     accuracy.batch_update(yy, yyhat)
-                logging.debug("Epoch {:>2} accuracy: {:.4f}".format(epoch,
-                                                                accuracy))
+                logging.debug("Epoch {:>2} accuracy: {!s}".format(epoch,
+                                                           accuracy))
         self.finalize()
 
 
