@@ -78,6 +78,9 @@ class Accuracy(ConfusionMixin):
         return "{}(correct={}, incorrect={})".format(
             self.__class__.__name__, self.correct, self.incorrect)
 
+    def __str__(self):
+        return "{:.4f}".format(self.accuracy)
+
     def __len__(self):
         return self.correct + self.incorrect
 
@@ -101,7 +104,7 @@ class Accuracy(ConfusionMixin):
     def accuracy(self):
         return self.correct / len(self)
 
-
+    
 class BinaryConfusion(ConfusionMixin):
 
     """
@@ -119,6 +122,9 @@ class BinaryConfusion(ConfusionMixin):
         return self.__class__.__name__ + \
             "(tp={}, fp={}, fn={}, tn={})".format(self.tp, self.fp,
                                                   self.fn, self.tn)
+
+    def __str__(self):
+        return "{:.4f}".format(self.accuracy)
 
     def pprint(self):
         """
@@ -141,10 +147,10 @@ class BinaryConfusion(ConfusionMixin):
 
     @property
     def summary(self):
-        return """Accuracy:\t{:.04f}
-Precision:\t{:.04f}
-Recall:\t\t{:.04f}
-F1:\t\t{:.04f}""".format(self.accuracy, self.precision, 
+        return """Accuracy:\t{:.4f}
+Precision:\t{:.4f}
+Recall:\t\t{:.4f}
+F1:\t\t{:.4f}""".format(self.accuracy, self.precision, 
                          self.recall, self.F1)
 
     def __len__(self):
@@ -327,6 +333,9 @@ class Confusion(ConfusionMixin):
 
     def __repr__(self):
         return "{}()".format(self.__class__.__name__)
+
+    def __str__(self):
+        return "{:.4f}".format(self.accuracy)
 
     def pprint(self):
         print("Confusion matrix:")
