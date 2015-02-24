@@ -34,14 +34,14 @@ perceptron: perceptron-like classifers, including:
 
 import logging
 
-from time import time
 from random import Random
 from functools import partial
 from operator import itemgetter
 from collections import defaultdict, namedtuple
 
-from .confusion import Accuracy
+from .timer import Timer
 from .jsonable import JSONable
+from .confusion import Accuracy
 from .decorators import reversify, tupleify
 
 
@@ -61,23 +61,15 @@ class Classifier(JSONable):
         logging.info("Starting {} epoch(s) of training.".format(epochs))
         for epoch in range(1, 1 + epochs):
             logging.info("Starting epoch {:>2}.".format(epoch))
-            tic = time()
             accuracy = Accuracy()
             self.random.shuffle(data)
-            for (y, phi) in data:
-                yhat = self.fit_one(y, phi, alpha)
-                accuracy.update(y, yhat)
-            logging.debug("Epoch {:>2} accuracy: {}".format(epoch,
-                                                            self._accuracy_str(accuracy)))
-            logging.debug("Epoch {:>2} time elapsed: {}.".format(epoch,
-                                                                 self._time_elapsed_str(tic)))
+            with Timer():
+                for (y, phi) in data:
+                    yhat = self.fit_one(y, phi, alpha)
+                    accuracy.update(y, yhat)
+                logging.debug("Epoch {:>2} accuracy: {:.4f}".format(epoch,
+                                                             accuracy))
         self.finalize()
-
-    def _accuracy_str(self, accuracy):
-        return "{:.04f}".format(accuracy.accuracy)
-
-    def _time_elapsed_str(self, tic):
-        return "{}s".format(int(time() - tic))
 
     def finalize(self):
         pass
@@ -256,16 +248,14 @@ class SequencePerceptron(Perceptron):
         logging.info("Starting {} epoch(s) of training.".format(epochs))
         for epoch in range(1, 1 + epochs):
             logging.info("Starting epoch {:>2}.".format(epoch))
-            tic = time()
             accuracy = Accuracy()
             self.random.shuffle(data)
-            for (yy, xx) in data:
-                yyhat = self.fit_one(yy, xx, alpha)
-                accuracy.batch_update(yy, yyhat)
-            logging.debug("Epoch {:>2} accuracy: {}".format(epoch,
-                                         self._accuracy_str(accuracy)))
-            logging.debug("Epoch {:>2} time elapsed: {}.".format(epoch,
-                                         self._time_elapsed_str(tic)))
+            with Timer():
+                for (yy, xx) in data:
+                    yyhat = self.fit_one(yy, xx, alpha)
+                    accuracy.batch_update(yy, yyhat)
+                logging.debug("Epoch {:>2} accuracy: {:.4f}".format(epoch,
+                                                                accuracy))
         self.finalize()
 
 
