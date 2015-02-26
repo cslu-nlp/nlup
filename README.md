@@ -12,3 +12,4 @@ Some projects using `nlup`:
 
 * [Detector Morse](http://github.com/cslu-nlp/detectormorse): simple sentence boundary detection
 * [Perceptronix Point Never](http://github.com/cslu-nlp/PerceptronixPointNever): simple PoS tagging
+* [Where's Yr Head At](http://github.com/cslu-nlp/WheresYrHeadAt): simple transition-based dependency parsing
