@@ -1,2 +1,6 @@
+__pycache__/
 *.py[co]
-__pycache__
+*.json.gz
+*.log
+*.sh
+
