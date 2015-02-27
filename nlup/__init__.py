@@ -26,3 +26,4 @@ from .jsonable import *
 from .perceptron import *
 from .readers import *
 from .timer import *
+from .util import *

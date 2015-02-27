@@ -7,10 +7,13 @@ from nltk import str2tuple, tuple2str
 
 def untagged_corpus(filename):
     """
-    Generate token lists from a file handle
+    Read and yield token lists a `filename` string
     """
     with open(filename, "r") as source:
         for line in source:
+            line = line.rstrip()
+            if not line:
+                continue
             yield line.split()
 
 
@@ -43,14 +46,28 @@ class TaggedSentence(object):
 
 def tagged_corpus(filename):
     """
-    Generate `TaggedSentence` objects from a file handle
+    Read and yield `TaggedSentence`s from a `filename` string
     """
     with open(filename, "r") as source:
         for line in source:
-            line = line.strip()
+            line = line.rstrip()
             if not line:
                 continue
             yield TaggedSentence.from_str(line)
+
+
+# FIXME(kbg) implement these
+
+class ChunkedSentence(object):
+
+    pass
+
+
+def chunked_corpus(filename):
+    """
+    Read and yield `ChunkedSentence`s from a `filename` string
+    """
+    raise NotImplementedError
 
 
 class DependencyParsedSentence(object):
@@ -102,12 +119,13 @@ class DependencyParsedSentence(object):
 
 def depparsed_corpus(filename):
     """
-    Generate `DependencyParseSentence` objects from a file handle
+    Read and yield `DependencyParseSentence`s from a `filename` string
     """
     with open(filename, "r") as source:
         sentence = ""
         for line in source:
-            if line.isspace():
+            line = line.rstrip()
+            if not line:
                 yield DependencyParsedSentence.from_str(sentence)
                 sentence = ""
                 continue
