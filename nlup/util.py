@@ -52,7 +52,7 @@ def isnumberlike(token):
     return False
 
 
-def case_features(token):
+def case_feature(token):
     """
     Returns zero or one case features for the `token` string
     """
