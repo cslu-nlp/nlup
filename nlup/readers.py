@@ -122,17 +122,16 @@ def depparsed_corpus(filename):
     Read and yield `DependencyParseSentence`s from a `filename` string
     """
     with open(filename, "r") as source:
-        sentence = ""
+        lines = []
         for line in source:
             line = line.strip()
             if not line:
-                print("=====\n" + sentence + "\n=====\n")
-                yield DependencyParsedSentence.from_str(sentence)
-                sentence = ""
+                yield DependencyParsedSentence.from_str("\n".join(lines))
+                lines = []
                 continue
-            sentence += "\n" + line
+            lines.append(line)
         if sentence:
-            yield DependencyParsedSentence.from_str(sentence)
+            yield DependencyParsedSentence.from_str("\n".join(lines))
 
 
 class ConstituencyParsedSentence(object):
