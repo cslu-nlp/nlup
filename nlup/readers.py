@@ -130,7 +130,7 @@ def depparsed_corpus(filename):
                 lines = []
                 continue
             lines.append(line)
-        if sentence:
+        if lines:
             yield DependencyParsedSentence.from_str("\n".join(lines))
 
 
