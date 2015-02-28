@@ -124,7 +124,7 @@ def depparsed_corpus(filename):
     with open(filename, "r") as source:
         sentence = ""
         for line in source:
-            line = line.rstrip()
+            line = line.strip()
             if not line:
                 print(sentence)
                 yield DependencyParsedSentence.from_str(sentence)
