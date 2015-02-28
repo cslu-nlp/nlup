@@ -12,5 +12,5 @@ All have been tested on CPython 3.4.1 and PyPy 3.2.5 (PyPy version 2.3.1). They 
 Some projects using `nlup`:
 
 * [Detector Morse](http://github.com/cslu-nlp/detectormorse): simple sentence boundary detection
-* [Perceptronix Point Never](http://github.com/cslu-nlp/PerceptronixPointNever): simple PoS tagging
+* [Perceptronix Point Never](http://github.com/cslu-nlp/PerceptronixPointNever): simple part of speech tagging
 * [Where's Yr Head At](http://github.com/cslu-nlp/WheresYrHeadAt): simple transition-based dependency parsing
