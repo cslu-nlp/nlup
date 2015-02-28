@@ -11,7 +11,7 @@ def untagged_corpus(filename):
     """
     with open(filename, "r") as source:
         for line in source:
-            line = line.rstrip()
+            line = line.strip()
             if not line:
                 continue
             yield line.split()
@@ -50,7 +50,7 @@ def tagged_corpus(filename):
     """
     with open(filename, "r") as source:
         for line in source:
-            line = line.rstrip()
+            line = line.strip()
             if not line:
                 continue
             yield TaggedSentence.from_str(line)
@@ -126,6 +126,7 @@ def depparsed_corpus(filename):
         for line in source:
             line = line.rstrip()
             if not line:
+                print(sentence)
                 yield DependencyParsedSentence.from_str(sentence)
                 sentence = ""
                 continue
