@@ -126,6 +126,7 @@ def depparsed_corpus(filename):
         for line in source:
             line = line.strip()
             if not line:
+                print("=====\n" + sentence + "\n=====\n")
                 yield DependencyParsedSentence.from_str(sentence)
                 sentence = ""
                 continue
