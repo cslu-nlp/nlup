@@ -21,6 +21,7 @@
 #
 # timer.py: simple timer context guard
 
+
 import logging
 
 from time import time
