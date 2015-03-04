@@ -143,17 +143,25 @@ class Perceptron(Classifier):
         self.random = Random(seed)
         self.weights = defaultdict(partial(defaultdict, int))
 
+    def register_classes(self, classes):
+        """
+        Register class labels in classifier instance
+        """
+        self.classes = tuple(classes)
+
     def score(self, y, phi):
         """
         Get score for one class (`y`) according to the feature vector
         `phi`
         """
+        assert self.classes
         return sum(self.weights[phi_i][y] for phi_i in phi)
 
     def scores(self, phi):
         """
         Get scores for all classes according to the feature vector `phi`
         """
+        assert self.classes
         scores = dict.fromkeys(self.classes, 0)
         for phi_i in phi:
             for (cls, weight) in self.weights[phi_i].items():
