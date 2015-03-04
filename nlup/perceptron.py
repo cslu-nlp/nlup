@@ -138,8 +138,8 @@ class Perceptron(Classifier):
 
     # constructor
 
-    def __init__(self, default=None, seed=None):
-        self.classes = {default}
+    def __init__(self, classes=(), seed=None):
+        self.classes = tuple(classes)
         self.random = Random(seed)
         self.weights = defaultdict(partial(defaultdict, int))
 
@@ -169,7 +169,6 @@ class Perceptron(Classifier):
         return argmax_score
 
     def fit_one(self, y, phi, alpha=1):
-        self.classes.add(y)
         yhat = self.predict(phi)
         if y != yhat:
             self.update(y, yhat, phi, alpha)
@@ -180,7 +179,6 @@ class Perceptron(Classifier):
         Given feature vector `x`, reward correct observation `y` and
         punish incorrect hypothesis `yhat` with the update `alpha`
         """
-        assert 0. < alpha <= 1.
         for phi_i in phi:
             ptr = self.weights[phi_i]
             ptr[y] += alpha
@@ -234,7 +232,6 @@ class SequencePerceptron(Perceptron):
         return (tuple(yyhat), tuple(phiphi))
 
     def fit_one(self, yy, xx, alpha=1):
-        self.classes.update(yy)
         # decode to get predicted sequence
         (yyhat, phiphi) = self.predict_with_transitions(xx)
         for (y, yhat, phi) in zip(yy, yyhat, phiphi):
@@ -390,8 +387,8 @@ class AveragedPerceptron(Perceptron):
     the perceptron algorithm. Machine Learning 37(3): 227-296.
     """
 
-    def __init__(self, default=None, seed=None):
-        self.classes = {default}
+    def __init__(self, classes=(), seed=None):
+        self.classes = tuple(classes)
         self.random = Random(seed)
         self.weights = defaultdict(partial(defaultdict, LazyWeight))
         self.time = 0
