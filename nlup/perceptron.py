@@ -234,6 +234,7 @@ class SequencePerceptron(Perceptron):
         phiphi = []
         for phi in self.efeats_fnc(xx):
             phi = phi + self.tfeats_fnc(yyhat[-self.order:])
+            print(phi, self.scores(phi))
             (yhat, _) = max(self.scores(phi).items(), key=itemgetter(1))
             yyhat.append(yhat)
             phiphi.append(phi)
