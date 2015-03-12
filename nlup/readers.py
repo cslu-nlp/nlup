@@ -63,6 +63,9 @@ class TaggedSentence(object):
         return " ".join(tuple2str(tt) for tt in \
                         zip(self.tokens, self.tags))
 
+    def __iter__(self):
+        return iter(zip(self.tokens, self.tags))
+
 
 def tagged_corpus(filename):
     """
@@ -135,6 +138,9 @@ class DependencyParsedSentence(object):
     {} \\& ROOT \\\\
     \\end{{deptext}}{}
 \\end{{dependency}}""".format(" \\& ".join(self.tokens), edges)
+
+    def __iter__(self):
+        return iter(zip(self.tokens, self.tags, self.heads, self.labels))
 
 
 def depparsed_corpus(filename):
