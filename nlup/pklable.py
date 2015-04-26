@@ -19,24 +19,23 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-# jsonable.py: mixin enabling serialization to compressed JSON
+# pklable.py: mixin enabling serialization to a compressed pickle file
 
-
+import pickle
 import gzip
-import jsonpickle
 
 
-class JSONable(object):
+class PKLable(object):
 
     """
-    Mixin which makes a class support `jsonpickle`
+    Mixin which makes a class support compressed pickling
     """
 
     @classmethod
     def load(cls, filename):
         with gzip.GzipFile(filename, "r") as source:
-            return jsonpickle.decode(source.read().decode("UTF-8"), keys=True)
+            return pickle.load(source)
 
     def dump(self, filename):
         with gzip.GzipFile(filename, "w") as sink:
-            sink.write(jsonpickle.encode(self, keys=True).encode("UTF-8"))
+            pickle.dump(self, sink)

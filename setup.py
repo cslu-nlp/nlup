@@ -2,7 +2,7 @@ from setuptools import setup
 
 
 setup(name="nlup",
-      version="0.4",
+      version="0.5",
       description="Core libraries for natural language processing",
       author="Kyle Gorman",
       author_email="gormanky@ohsu.edu",
