@@ -24,7 +24,8 @@ setup(name="nlup",
       keywords=["nlp", "natural language processing", "text", "text processing", "ai", "artificial intelligent", "neural net", "perceptron", "data", "science", "statistics", "data science", "math", "machine learning", "computer science", "information theory"],
       classifiers=[
           "Programming Language :: Python",
-          "Programming Language :: Python :: 2.7",
+          "Programming Language :: Python :: 3.3",
+          # "Programming Language :: Python :: 2.7",  # DetectorMorse (depends on nlup) works for 2.7, but not all of nlup tested on 2.7
           "Development Status :: 5 - Production/Stable",
           "Environment :: Other Environment",
           "Environment :: Console",
