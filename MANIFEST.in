@@ -1,6 +1,9 @@
 # list of non-python files that should be included with every install
-recursive-include . *.txt
-recursive-include . *.md
-recursive-include . *.rst
-recursive-include . *.gz
+include *.txt
+# recursive-include * *.txt
+include *.md
+# recursive-include * *.md
+include *.rst
+# recursive-include * *.rst
+# recursive-include * *.gz
 
