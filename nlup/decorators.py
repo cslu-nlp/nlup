@@ -20,11 +20,12 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # decorators.py: decorators for library
-
-
-import logging
+import sys
+exit = sys.exit
 
 from functools import wraps
+
+import logging
 
 
 def listify(gen):
@@ -39,9 +40,9 @@ def listify(gen):
 
 def reversify(fnc):
     """
-    Converts a function (or generator) which returns an iterable to one 
-    which returns that as a reversed list. This is done by casting the 
-    iterable to a list (which evaluates it, in the case it's a generator) 
+    Converts a function (or generator) which returns an iterable to one
+    which returns that as a reversed list. This is done by casting the
+    iterable to a list (which evaluates it, in the case it's a generator)
     and then reversing it in place.
     """
     @wraps(fnc)
@@ -84,8 +85,8 @@ def frozensetify(gen):
 
 def meanify(gen):
     """
-    Converts. a generator of numbers to one which returns the mean value, 
-    iteratively computed to avoid overflow. This algorithm is recommended 
+    Converts. a generator of numbers to one which returns the mean value,
+    iteratively computed to avoid overflow. This algorithm is recommended
     in AoCP (2.4.2.2).
     """
     @wraps(gen)
