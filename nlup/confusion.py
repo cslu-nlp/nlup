@@ -242,6 +242,14 @@ F1:\t\t{:.4f}""".format(self.accuracy, self.precision,
         return self.Sscore()
 
     @property
+    def youden_J(self):
+        """
+        Youden's J statistic, where 0 indicates no diagnostic utility and
+        1 indicates a perfect test.
+        """
+        return self.sensitivity + self.specificity - 1.
+
+    @property
     def MCC(self):
         try:
             N = len(self)
