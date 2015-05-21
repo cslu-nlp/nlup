@@ -296,7 +296,7 @@ F1:\t\t{:.4f}""".format(self.accuracy, self.precision,
     @property
     def specificity(self):
         try:
-            return self.tp / (self.fp + self.tn)
+            return self.tn / (self.tn + self.fp)
         except ZeroDivisionError:
             return INF
 
