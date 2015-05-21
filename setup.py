@@ -14,7 +14,7 @@ except:  # (IOError, ImportError, OSError, RuntimeError):
 
 setup(name="nlup",
       include_package_data=True,
-      version="0.5",
+      version="0.6",
       description=description,
       author="Kyle Gorman",
       author_email="gormanky@ohsu.edu",
