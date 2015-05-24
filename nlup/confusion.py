@@ -226,7 +226,7 @@ F1:\t\t{:.4f}""".format(self.accuracy, self.precision,
     def F1(self):
         return self.Fscore()
 
-    def Sscore(self, ns_ratio=1.):
+    def Sscore(self, ratio=1.):
         """
         Same idea as F-score, but defined in terms of specificity and
         sensitivity; ratio is the importance of specificity vs. sensitivity
