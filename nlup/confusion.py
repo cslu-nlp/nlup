@@ -235,7 +235,7 @@ F1:\t\t{:.4f}""".format(self.accuracy, self.precision,
         r_square = ratio * ratio
         Sp = self.specificity
         Se = self.sensitivity
-        return ((ratio + r_square) * Sp * Se) / (r_square * Sp * Se)
+        return ((1. + r_square) * Sp * Se) / (r_square * Sp * Se)
 
     @property
     def S1(self):
