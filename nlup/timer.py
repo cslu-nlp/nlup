@@ -1,4 +1,4 @@
-# Copyright (C) 2015 Kyle Gorman
+# Copyright (C) 2015-2016 Kyle Gorman
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the
@@ -18,8 +18,8 @@
 # CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-#
-# timer.py: simple timer context guard
+
+"""Context guard for timing code execution."""
 
 
 import logging
@@ -28,12 +28,16 @@ from time import time
 
 
 class Timer(object):
+  """Wall-clock timer context guard."""
 
-    def __enter__(self, logger=logging.info):
-        self.logger = logger
-        self.tic = time()
-        return self
+  def __enter__(self, logger=logging.info):
+    self.logger = logger
+    self.tic = time()
+    return self
 
-    def __exit__(self, *args):
-        self.toc = time()
-        self.logger("{}s elapsed.".format(int(self.toc - self.tic)))
+  def __exit__(self, *args):
+    self.toc = time()
+    self.logger("{}s elapsed.".format(int(self.toc - self.tic)))
+
+
+# See decorators.py for a decorator form of the same.
