@@ -183,7 +183,7 @@ class SequencePerceptron(Perceptron):
     This method tag a sequence using a greedy approximation in which each
     sequence is tagged using transition features based on earlier hypotheses.
     The time complexity of this operation is O(nt) where n is sequence length
-    and t is the cardinality of the tagset. 
+    and t is the cardinality of the tagset.
     """
     (yyhat, _) = self._greedy_predict(xx)
     return yyhat
@@ -198,7 +198,7 @@ class SequencePerceptron(Perceptron):
     phiphi = []
     for phi in self.efeats_fnc(xx):
       phi = phi + self.tfeats_fnc(yyhat[-self.order:])
-      (yhat, _) = max(self.scores(phi).items(), key=itemgetter(1))
+      yhat = max(self.scores(phi).items(), key=itemgetter(1))[0]
       yyhat.append(yhat)
       phiphi.append(phi)
     return (tuple(yyhat), tuple(phiphi))

@@ -78,14 +78,40 @@ def tagged_corpus(filename):
 
 
 class ChunkedSentence(object):
+  """NP-chunking data in token\ttag\tchunk format."""
 
-  def __init__(self):
-    raise NotImplementedError
+  def __init__(self, tokens, tags, chunks):
+    self.tokens = tokens
+    self.tags = tags
+    self.chunks = chunks
+    assert len(self.tokens) == len(self.tags) == len(self.chunks)
+
+  def __len__(self):
+    return len(self.tokens)
+
+  def __repr__(self):
+    return "{}(tokens={!r}, tags={!r}, chunks={!r})".format(
+        self.__class__.__name__, self.tokens, self.tags, self.chunks)
+
+  def __str__(self):
+    return "\n".join("\t".join(*pieces) for pieces in self)
+
+  def __iter__(self):
+    return iter(zip(self.tokens, self.tags, self.chunks))
 
 
 def chunked_corpus(filename):
   """Reads and yields ChunkedSentence objects from a file."""
-  raise NotImplementedError
+  with open(filename, "r") as source:
+    data = []
+    for line in source:
+      line = line.rstrip()
+      if not line:
+        yield ChunkedSentence(*zip(*data))
+      else:
+        (token, tags, chunk, rest) = line.split(None, 4)
+        data.append((token, tags, chunk))
+    yield ChunkedSentence(*zip(*data))
 
 
 class DependencyParsedSentence(object):
