@@ -20,11 +20,8 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-try:
-  from nltk import str2tuple
-  from nltk import tuple2str
-except:
-  pass
+from nltk import str2tuple
+from nltk import tuple2str
 
 
 def untagged_corpus(filename):
@@ -94,7 +91,7 @@ class ChunkedSentence(object):
         self.__class__.__name__, self.tokens, self.tags, self.chunks)
 
   def __str__(self):
-    return "\n".join("\t".join(*pieces) for pieces in self)
+    return "\n".join("\t".join(pieces) for pieces in self)
 
   def __iter__(self):
     return iter(zip(self.tokens, self.tags, self.chunks))
@@ -109,7 +106,7 @@ def chunked_corpus(filename):
       if not line:
         yield ChunkedSentence(*zip(*data))
       else:
-        (token, tags, chunk, rest) = line.split(None, 4)
+        (token, tags, chunk) = line.split()
         data.append((token, tags, chunk))
     yield ChunkedSentence(*zip(*data))
 

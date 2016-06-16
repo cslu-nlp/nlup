@@ -21,10 +21,7 @@
 
 
 import gzip
-try:
-  import jsonpickle
-except:
-  pass
+import jsonpickle
 
 
 class JSONable(object):
