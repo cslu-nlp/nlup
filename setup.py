@@ -19,7 +19,7 @@ setup(name="nlup",
       author="Kyle Gorman",
       author_email="kylebgorman@gmail.com",
       url="http://github.com/cslu-nlp/nlup/",
-      install_requires=["jsonpickle >= 0.9.0"],
+      install_requires=["jsonpickle >= 0.9.0", "nltk >= 3.1"],
       packages=["nlup"],
       keywords=["nlp", "natural language processing", "text", "text processing", "ai", "artificial intelligence", "neural net", "perceptron", "data", "science", "statistics", "data science", "math", "machine learning", "computer science", "information theory"],
       classifiers=[
