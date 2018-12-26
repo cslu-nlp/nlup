@@ -20,8 +20,28 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-from nltk import str2tuple
-from nltk import tuple2str
+def str2tuple(tt):
+  """
+  Convert tagged token like 'fly/VB' into a tuple like ('fly', 'VB'). If no '/'
+  is found, return (tt, None). If multiple '/' are found, ignore all but the
+  last;  e.g., 'on/off/NN' results in ('on/off', 'NN')
+  """
+  token_tag = tt.rsplit('/', 1)
+  if len(token_tag) > 1:
+    return token_tag[0], token_tag[1].upper()
+  return token_tag[0], None
+
+
+def tuple2str(tt):
+  """
+  Convert a ('token', 'tag') tuple into single-string 'token/tag' form.
+  If the tag is None, just the token is returned; if the tag contains the
+  separator, '/', an AssertionError is raised.
+  """
+  if tt[1] is None:
+    return tt[0]
+  assert '/' not in tt[1], 'tag must not contain "/"'
+  return '%s/%s' % tt
 
 
 def untagged_corpus(filename):

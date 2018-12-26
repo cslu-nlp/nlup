@@ -18,7 +18,7 @@ setup(
     author_email="kylebgorman@gmail.com",
     url="http://github.com/cslu-nlp/nlup/",
     license="MIT",
-    install_requires=["jsonpickle >= 0.9.0", "nltk >= 3.1"],
+    install_requires=["jsonpickle >= 0.9.0"],
     packages=["nlup"],
     keywords=[
         "nlp",
