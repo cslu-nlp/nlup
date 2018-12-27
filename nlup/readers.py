@@ -27,9 +27,8 @@ def str2tuple(tt):
   last;  e.g., 'on/off/NN' results in ('on/off', 'NN')
   """
   token_tag = tt.rsplit('/', 1)
-  if len(token_tag) > 1:
-    return token_tag[0], token_tag[1].upper()
-  return token_tag[0], None
+  assert token_tag[1] is not None
+  return (token_tag[0], token_tag[1].upper())
 
 
 def tuple2str(tt):
@@ -38,10 +37,9 @@ def tuple2str(tt):
   If the tag is None, just the token is returned; if the tag contains the
   separator, '/', an AssertionError is raised.
   """
-  if tt[1] is None:
-    return tt[0]
+  assert tt[1] is not None
   assert '/' not in tt[1], 'tag must not contain "/"'
-  return '%s/%s' % tt
+  return "{}/{}".format(*tt)
 
 
 def untagged_corpus(filename):
