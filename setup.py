@@ -10,7 +10,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 setup(
     name="nlup",
     include_package_data=True,
-    version="0.7post1",
+    version="0.8",
     description=description,
     long_description=long_description,
     long_description_content_type="text/markdown",
