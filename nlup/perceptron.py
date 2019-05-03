@@ -101,7 +101,7 @@ class BinaryPerceptron(Classifier):
     if y is False:
       alpha *= -1
     for phi_i in phi:
-      self.weights[phi] += alpha
+      self.weights[phi_i] += alpha
 
 
 class Perceptron(Classifier):
