@@ -10,7 +10,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 setup(
     name="nlup",
     include_package_data=True,
-    version="0.8",
+    version="0.9",
     description=description,
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -42,6 +42,7 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Development Status :: 5 - Production/Stable",
         "Environment :: Other Environment",
         "Environment :: Console",
